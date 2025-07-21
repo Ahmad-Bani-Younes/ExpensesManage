@@ -78,6 +78,7 @@
     <label for="salary">💰 الراتب الشهري</label>
     <input type="number" id="salary" placeholder="مثال: 700" />
 
+
     <!-- <label for="extra">💼 الدخل الإضافي</label>
     <input type="number" id="extra" placeholder="مثال: 150" /> -->
 
@@ -105,6 +106,9 @@
     <!-- عرض سجل المصروفات -->
     <div class="expenses-list" id="expense-list"></div>
 
+    <div class="expenses-list" id="stats"></div>
+
+
     <small>سيتم خصم هذا المبلغ من مصروفك الشهري وتوفيره تلقائيًا.</small>
 
 
@@ -117,6 +121,8 @@
 function calculate() {
   const salary = parseFloat(document.getElementById("salary").value) || 0;
   const expenses = parseFloat(document.getElementById("expenses").value) || 0;
+const goal = parseFloat(document.getElementById("monthly-goal").value) || 0;
+localStorage.setItem("saving_goal", goal);
 
   const totalIncome = salary;
   const netBeforeSaving = totalIncome - expenses;
@@ -138,6 +144,10 @@ function calculate() {
   localStorage.setItem("last_date", new Date().toLocaleDateString());
   localStorage.setItem("saving_plan", savingAmount.toFixed(2));
   localStorage.setItem("saving_percent", savingPercent);
+
+
+  
+
 
   updateUI();
 }
@@ -212,6 +222,17 @@ document.getElementById("result").innerHTML = `
 
       document.getElementById("remaining").innerText = `💰 المتبقي اليوم: ${remainingToday} دينار`;
 
+      // عرض تنبيهات بناءً على السلوك اليومي
+let alertMessage = "";
+if (remainingToday < 0) {
+  alertMessage = `⚠️ لقد تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingToday)} دينار`;
+} else if (remainingToday > 0) {
+  alertMessage = `✅ ممتاز! وفّرت ${remainingToday} دينار اليوم`;
+}
+
+document.getElementById("remaining").innerHTML += `<br>${alertMessage}`;
+
+
       // عرض المصاريف مفصولة حسب اليوم
       const grouped = {};
       expenses.forEach(e => {
@@ -235,7 +256,48 @@ for (let date in extras) {
   extraHtml += `📅 ${date}: +${extras[date].toFixed(2)} دينار<br>`;
 }
 
+
+
 document.getElementById("expense-list").innerHTML = extraHtml + html || "لا يوجد مصروفات بعد.";
+
+// 📊 إعداد إحصائيات ذكية
+let allDates = new Set();
+let totalSpent = 0;
+let maxSpent = 0;
+let maxSpentDate = "";
+let daysWithExpenses = new Set();
+
+for (let exp of allExpenses) {
+  allDates.add(exp.date);
+  totalSpent += exp.amount;
+  if (!savingsMap[exp.date]) savingsMap[exp.date] = 0;
+  savingsMap[exp.date] += exp.amount;
+  if (savingsMap[exp.date] > maxSpent) {
+    maxSpent = savingsMap[exp.date];
+    maxSpentDate = exp.date;
+  }
+  daysWithExpenses.add(exp.date);
+}
+
+let numDays = allDates.size;
+let avgSpent = numDays > 0 ? (totalSpent / numDays).toFixed(2) : 0;
+
+// الأيام التي لم يصرف بها شيء (دخل إضافي أو لا دخل)
+let zeroSpendDays = [];
+for (let date in extras) {
+  if (!daysWithExpenses.has(date)) zeroSpendDays.push(date);
+}
+
+document.getElementById("stats").innerHTML = `
+  <hr><b>📊 إحصائيات الإنفاق:</b><br>
+  🔁 أيام المصروف المُسجل: ${numDays} يوم<br>
+  🧾 إجمالي المصاريف: ${totalSpent.toFixed(2)} دينار<br>
+  📉 متوسط الإنفاق اليومي: ${avgSpent} دينار<br>
+  🔥 أكثر يوم إنفاقًا: ${maxSpentDate} (${maxSpent.toFixed(2)} دينار)<br>
+  ✅ أيام بدون مصروف: ${zeroSpendDays.length} (${zeroSpendDays.join(", ")})
+`;
+
+
     }
 
     function resetData() {
