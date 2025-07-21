@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>إدارة المصاريف الشخصية</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f2f5f8;
+      padding: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #27ae60;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #219150;
+    }
+    .result, .summary {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #34495e;
+      text-align: center;
+    }
+    .expenses-list {
+      margin-top: 10px;
+      font-size: 15px;
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    hr {
+      border: 1px dashed #ccc;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>تطبيق إدارة المصاريف</h1>
+  <div class="container">
+
+    <!-- البيانات الأساسية -->
+    <label for="salary">💰 الراتب الشهري</label>
+    <input type="number" id="salary" placeholder="مثال: 700" />
+
+    <!-- <label for="extra">💼 الدخل الإضافي</label>
+    <input type="number" id="extra" placeholder="مثال: 150" /> -->
+
+    <label for="expenses">📋 الالتزامات الشهرية</label>
+    <input type="number" id="expenses" placeholder="مثال: 300" />
+
+
+
+    <button onclick="calculate()">احسب المصروف اليومي</button>
+    <div class="result" id="result"></div>
+
+    <!-- إدخال مصروف يومي -->
+    <hr />
+
+    <label for="extra-today">💼 دخل إضافي اليوم</label>
+<input type="number" id="extra-today" placeholder="مثال: 5" />
+<button onclick="addExtra()">أضف الدخل الإضافي</button>
+
+    <label for="daily-expense">💸 أضف مصروف اليوم</label>
+    <input type="number" id="daily-expense" placeholder="مثال: 20" />
+    <button onclick="addExpense()">أضف المصروف</button>
+
+    <div class="summary" id="remaining"></div>
+
+    <!-- عرض سجل المصروفات -->
+    <div class="expenses-list" id="expense-list"></div>
+
+    <small>سيتم خصم هذا المبلغ من مصروفك الشهري وتوفيره تلقائيًا.</small>
+
+
+    <!-- زر إعادة التهيئة -->
+    <button style="background-color: #e74c3c;" onclick="resetData()">♻️ إعادة ضبط البيانات</button>
+
+  </div>
+
+  <script>
+function calculate() {
+  const salary = parseFloat(document.getElementById("salary").value) || 0;
+  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
+
+  const totalIncome = salary;
+  const netBeforeSaving = totalIncome - expenses;
+
+  let savingPercent = 0;
+  if (netBeforeSaving < 100) savingPercent = 5;
+  else if (netBeforeSaving < 200) savingPercent = 10;
+  else if (netBeforeSaving < 400) savingPercent = 15;
+  else savingPercent = 20;
+
+  const savingAmount = (totalIncome * savingPercent / 100);
+  const net = totalIncome - expenses - savingAmount;
+  const daily = (net / 30).toFixed(2);
+
+  localStorage.setItem("daily_limit", daily);
+  localStorage.setItem("carry", "0");
+  localStorage.setItem("expenses", JSON.stringify([]));
+  localStorage.setItem("extra_income", JSON.stringify({})); // Reset daily extras
+  localStorage.setItem("last_date", new Date().toLocaleDateString());
+  localStorage.setItem("saving_plan", savingAmount.toFixed(2));
+  localStorage.setItem("saving_percent", savingPercent);
+
+  updateUI();
+}
+
+
+function addExtra() {
+  const amount = parseFloat(document.getElementById("extra-today").value);
+  if (!amount || amount <= 0) return;
+
+  const today = new Date().toLocaleDateString();
+  let extras = JSON.parse(localStorage.getItem("extra_income")) || {};
+  extras[today] = (extras[today] || 0) + amount;
+  localStorage.setItem("extra_income", JSON.stringify(extras));
+
+  document.getElementById("extra-today").value = "";
+  updateUI();
+}
+
+
+
+
+    function addExpense() {
+      const amount = parseFloat(document.getElementById("daily-expense").value);
+      if (!amount || amount <= 0) return;
+
+      const today = new Date().toLocaleDateString();
+      let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+      expenses.push({ amount, date: today });
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+
+      document.getElementById("daily-expense").value = "";
+      updateUI();
+    }
+
+    function updateUI() {
+      const today = new Date().toLocaleDateString();
+      const lastDate = localStorage.getItem("last_date");
+      const dailyLimit = parseFloat(localStorage.getItem("daily_limit")) || 0;
+      let carry = parseFloat(localStorage.getItem("carry")) || 0;
+      let extras = JSON.parse(localStorage.getItem("extra_income")) || {};
+const extraToday = extras[today] || 0;
+
+
+const baseSaving = parseFloat(localStorage.getItem("saving_plan")) || 0;
+const dynamicSaving = (extraToday * (parseFloat(localStorage.getItem("saving_percent")) || 0) / 100).toFixed(2);
+const totalSaving = (baseSaving / 30 + parseFloat(dynamicSaving)).toFixed(2);
+const savingPercent = localStorage.getItem("saving_percent") || 0;
+
+
+      let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+      // تحقق من تغيير اليوم لترحيل الرصيد
+      if (lastDate && lastDate !== today) {
+        const yesterdayExpenses = expenses.filter(e => e.date === lastDate);
+        const spentYesterday = yesterdayExpenses.reduce((sum, e) => sum + e.amount, 0);
+        const saved = Math.max(dailyLimit - spentYesterday, 0);
+        carry += saved;
+        localStorage.setItem("carry", carry.toFixed(2));
+        localStorage.setItem("last_date", today);
+      }
+
+      const todayExpenses = expenses.filter(e => e.date === today);
+      const totalSpentToday = todayExpenses.reduce((sum, e) => sum + e.amount, 0);
+const effectiveLimit = (dailyLimit + carry + extraToday).toFixed(2);
+      const remainingToday = (effectiveLimit - totalSpentToday).toFixed(2);
+
+document.getElementById("result").innerHTML = `
+✅ المصروف المتاح لليوم: ${effectiveLimit} دينار (بما فيه المرحل + دخل إضافي ${extraToday})<br>
+🏦 خطة التوفير (${savingPercent}%): ${baseSaving} من الراتب + ${dynamicSaving} من دخل اليوم<br>
+📉 تم خصم ${totalSaving} دينار من المصروف اليومي للتوفير
+`;
+
+      document.getElementById("remaining").innerText = `💰 المتبقي اليوم: ${remainingToday} دينار`;
+
+      // عرض المصاريف مفصولة حسب اليوم
+      const grouped = {};
+      expenses.forEach(e => {
+        if (!grouped[e.date]) grouped[e.date] = [];
+        grouped[e.date].push(e.amount);
+      });
+
+      let html = '';
+      for (let date in grouped) {
+        const total = grouped[date].reduce((a, b) => a + b, 0).toFixed(2);
+        html += `<hr><b>📅 ${date}</b><br>`;
+        grouped[date].forEach((amt, i) => {
+          html += `🧾 مصروف ${i + 1}: -${amt} دينار<br>`;
+        });
+        html += `🔢 مجموع اليوم: ${total} دينار<br>`;
+      }
+
+      // عرض الدخل الإضافي لكل يوم
+let extraHtml = "<hr><b>💼 دخل إضافي حسب الأيام:</b><br>";
+for (let date in extras) {
+  extraHtml += `📅 ${date}: +${extras[date].toFixed(2)} دينار<br>`;
+}
+
+document.getElementById("expense-list").innerHTML = extraHtml + html || "لا يوجد مصروفات بعد.";
+    }
+
+    function resetData() {
+      if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // عند تحميل الصفحة
+    window.onload = updateUI;
+  </script>
+</body>
+</html>
