@@ -240,15 +240,20 @@ document.getElementById("remaining").innerHTML += `<br>${alertMessage}`;
         grouped[e.date].push(e.amount);
       });
 
-      let html = '';
-      for (let date in grouped) {
-        const total = grouped[date].reduce((a, b) => a + b, 0).toFixed(2);
-        html += `<hr><b>📅 ${date}</b><br>`;
-        grouped[date].forEach((amt, i) => {
-          html += `🧾 مصروف ${i + 1}: -${amt} دينار<br>`;
-        });
-        html += `🔢 مجموع اليوم: ${total} دينار<br>`;
-      }
+let html = '';
+Object.keys(grouped).sort((a, b) => {
+  const da = new Date(a);
+  const db = new Date(b);
+  return db - da; // الأحدث أولاً
+}).forEach(date => {
+  const total = grouped[date].reduce((a, b) => a + b, 0).toFixed(2);
+  html += `<hr><b>📅 ${date}</b><br>`;
+  grouped[date].forEach((amt, i) => {
+    html += `🧾 مصروف ${i + 1}: -${amt} دينار<br>`;
+  });
+  html += `🔢 مجموع اليوم: ${total} دينار<br>`;
+});
+
 
       // عرض الدخل الإضافي لكل يوم
 let extraHtml = "<hr><b>💼 دخل إضافي حسب الأيام:</b><br>";
