@@ -244,10 +244,20 @@ const effectiveLimit = (dailyLimit + carry + extraToday).toFixed(2);
       const remainingToday = (effectiveLimit - totalSpentToday).toFixed(2);
 
 document.getElementById("result").innerHTML = `
-✅ المصروف المتاح لليوم: ${effectiveLimit} دينار (بما فيه المرحل + دخل إضافي ${extraToday})<br>
-🏦 خطة التوفير (${savingPercent}%): ${baseSaving} من الراتب + ${dynamicSaving} من دخل اليوم<br>
-📉 تم خصم ${totalSaving} دينار من المصروف اليومي للتوفير
+  <div style="background:#e8f5e9; border-radius:8px; padding:10px; margin-bottom:10px; color:#2e7d32;">
+    ✅ <b>المصروف المتاح لليوم:</b> ${effectiveLimit} دينار<br>
+    <small>(يشمل: المرحل + دخل إضافي ${extraToday})</small>
+  </div>
+  <div style="background:#e3f2fd; border-radius:8px; padding:10px; margin-bottom:10px; color:#1565c0;">
+    🏦 <b>خطة التوفير (${savingPercent}%):</b><br>
+    💰 من الراتب: ${baseSaving} دينار<br>
+    💼 من دخل اليوم: ${dynamicSaving} دينار
+  </div>
+  <div style="background:#fce4ec; border-radius:8px; padding:10px; color:#ad1457;">
+    🏁 <b>المجموع المخصوم للتوفير:</b> ${totalSaving} دينار من مصروف اليوم
+  </div>
 `;
+
 
       document.getElementById("remaining").innerText = `💰 المتبقي اليوم: ${remainingToday} دينار`;
 
@@ -273,12 +283,12 @@ const expenseContainer = document.getElementById("expense-list");
 expenseContainer.innerHTML = ""; // مسح القديم
 
 // أولاً عرض دخل إضافي
-let extraBlock = document.createElement("div");
-extraBlock.innerHTML = "<hr><b>💼 دخل إضافي حسب الأيام:</b><br>";
-for (let date in extras) {
-  extraBlock.innerHTML += `📅 ${date}: +${extras[date].toFixed(2)} دينار<br>`;
-}
-expenseContainer.appendChild(extraBlock);
+// let extraBlock = document.createElement("div");
+// extraBlock.innerHTML = "<hr><b>💼 دخل إضافي حسب الأيام:</b><br>";
+// for (let date in extras) {
+//   extraBlock.innerHTML += `📅 ${date}: +${extras[date].toFixed(2)} دينار<br>`;
+// }
+// expenseContainer.appendChild(extraBlock);
 
 // ثانياً: عرض كل يوم على شكل بطاقة أنيقة
 Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
@@ -287,7 +297,9 @@ Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
 
   const total = grouped[date].reduce((a, b) => a + b, 0).toFixed(2);
 
-  card.innerHTML = `<h3>📅 ${date}</h3>`;
+const extraForDay = extras[date] ? `💼 دخل إضافي: +${extras[date].toFixed(2)} دينار<br>` : "";
+card.innerHTML = `<h3>📅 ${date}</h3>${extraForDay}`;
+
 
   grouped[date].forEach((amt, i) => {
     const item = document.createElement("div");
