@@ -68,6 +68,35 @@
       border: 1px dashed #ccc;
       margin: 10px 0;
     }
+
+
+    .day-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.day-card h3 {
+  margin-bottom: 10px;
+  color: #2980b9;
+}
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ecf0f1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+.expense-item button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
   </style>
 </head>
 <body>
@@ -240,30 +269,47 @@ document.getElementById("remaining").innerHTML += `<br>${alertMessage}`;
         grouped[e.date].push(e.amount);
       });
 
-let html = '';
-Object.keys(grouped).sort((a, b) => {
-  const da = new Date(a);
-  const db = new Date(b);
-  return db - da; // الأحدث أولاً
-}).forEach(date => {
+const expenseContainer = document.getElementById("expense-list");
+expenseContainer.innerHTML = ""; // مسح القديم
+
+// أولاً عرض دخل إضافي
+let extraBlock = document.createElement("div");
+extraBlock.innerHTML = "<hr><b>💼 دخل إضافي حسب الأيام:</b><br>";
+for (let date in extras) {
+  extraBlock.innerHTML += `📅 ${date}: +${extras[date].toFixed(2)} دينار<br>`;
+}
+expenseContainer.appendChild(extraBlock);
+
+// ثانياً: عرض كل يوم على شكل بطاقة أنيقة
+Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
+  const card = document.createElement("div");
+  card.className = "day-card";
+
   const total = grouped[date].reduce((a, b) => a + b, 0).toFixed(2);
-  html += `<hr><b>📅 ${date}</b><br>`;
+
+  card.innerHTML = `<h3>📅 ${date}</h3>`;
+
   grouped[date].forEach((amt, i) => {
-    html += `🧾 مصروف ${i + 1}: -${amt} دينار<br>`;
+    const item = document.createElement("div");
+    item.className = "expense-item";
+    item.innerHTML = `
+      🧾 مصروف ${i + 1}: -${amt} دينار
+      <span>
+        <button onclick="editExpense('${date}', ${i})">📝</button>
+        <button onclick="deleteExpense('${date}', ${i})">🗑️</button>
+      </span>
+    `;
+    card.appendChild(item);
   });
-  html += `🔢 مجموع اليوم: ${total} دينار<br>`;
+
+  const totalRow = document.createElement("div");
+  totalRow.style.marginTop = "8px";
+  totalRow.innerHTML = `🔢 مجموع اليوم: <b>${total} دينار</b>`;
+  card.appendChild(totalRow);
+
+  expenseContainer.appendChild(card);
 });
 
-
-      // عرض الدخل الإضافي لكل يوم
-let extraHtml = "<hr><b>💼 دخل إضافي حسب الأيام:</b><br>";
-for (let date in extras) {
-  extraHtml += `📅 ${date}: +${extras[date].toFixed(2)} دينار<br>`;
-}
-
-
-
-document.getElementById("expense-list").innerHTML = extraHtml + html || "لا يوجد مصروفات بعد.";
 
 // 📊 إعداد إحصائيات ذكية
 let allDates = new Set();
@@ -304,6 +350,48 @@ document.getElementById("stats").innerHTML = `
 
 
     }
+
+
+
+    function deleteExpense(date, index) {
+  let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+  // احذف العنصر المناسب من المصاريف
+  let filtered = [];
+  let count = 0;
+  for (let exp of expenses) {
+    if (exp.date === date) {
+      if (count === index) {
+        count++;
+        continue; // احذف هذا
+      }
+      count++;
+    }
+    filtered.push(exp);
+  }
+  localStorage.setItem("expenses", JSON.stringify(filtered));
+  updateUI();
+}
+
+function editExpense(date, index) {
+  let newAmount = prompt("أدخل القيمة الجديدة:");
+  if (!newAmount || isNaN(newAmount) || newAmount <= 0) return;
+
+  newAmount = parseFloat(newAmount);
+  let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+  let count = 0;
+  for (let i = 0; i < expenses.length; i++) {
+    if (expenses[i].date === date) {
+      if (count === index) {
+        expenses[i].amount = newAmount;
+        break;
+      }
+      count++;
+    }
+  }
+  localStorage.setItem("expenses", JSON.stringify(expenses));
+  updateUI();
+}
+
 
     function resetData() {
       if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
