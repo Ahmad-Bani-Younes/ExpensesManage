@@ -11,6 +11,8 @@
       padding: 20px;
       direction: rtl;
       text-align: right;
+        word-wrap: break-word;
+
     }
     h1 {
       text-align: center;
@@ -117,6 +119,7 @@
 
 
     <button onclick="calculate()">احسب المصروف اليومي</button>
+    <div id="settings-card" style="margin-top:20px;"></div>
     <div class="result" id="result"></div>
 
     <!-- إدخال مصروف يومي -->
@@ -150,8 +153,12 @@
 function calculate() {
   const salary = parseFloat(document.getElementById("salary").value) || 0;
   const expenses = parseFloat(document.getElementById("expenses").value) || 0;
-const goal = parseFloat(document.getElementById("monthly-goal").value) || 0;
-localStorage.setItem("saving_goal", goal);
+
+  localStorage.setItem("saved_salary", salary);
+  localStorage.setItem("saved_expenses", expenses);
+
+// const goal = parseFloat(document.getElementById("monthly-goal").value) || 0;
+// localStorage.setItem("saving_goal", goal);
 
   const totalIncome = salary;
   const netBeforeSaving = totalIncome - expenses;
@@ -282,15 +289,7 @@ document.getElementById("remaining").innerHTML += `<br>${alertMessage}`;
 const expenseContainer = document.getElementById("expense-list");
 expenseContainer.innerHTML = ""; // مسح القديم
 
-// أولاً عرض دخل إضافي
-// let extraBlock = document.createElement("div");
-// extraBlock.innerHTML = "<hr><b>💼 دخل إضافي حسب الأيام:</b><br>";
-// for (let date in extras) {
-//   extraBlock.innerHTML += `📅 ${date}: +${extras[date].toFixed(2)} دينار<br>`;
-// }
-// expenseContainer.appendChild(extraBlock);
 
-// ثانياً: عرض كل يوم على شكل بطاقة أنيقة
 Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
   const card = document.createElement("div");
   card.className = "day-card";
@@ -323,14 +322,34 @@ card.innerHTML = `<h3>📅 ${date}</h3>${extraForDay}`;
 });
 
 
-// 📊 إعداد إحصائيات ذكية
+// // 📊 إعداد إحصائيات ذكية
+// let allDates = new Set();
+// let totalSpent = 0;
+// let maxSpent = 0;
+// let maxSpentDate = "";
+// let daysWithExpenses = new Set();
+
+// for (let exp of allExpenses) {
+//   allDates.add(exp.date);
+//   totalSpent += exp.amount;
+//   if (!savingsMap[exp.date]) savingsMap[exp.date] = 0;
+//   savingsMap[exp.date] += exp.amount;
+//   if (savingsMap[exp.date] > maxSpent) {
+//     maxSpent = savingsMap[exp.date];
+//     maxSpentDate = exp.date;
+//   }
+//   daysWithExpenses.add(exp.date);
+// }
+
+
 let allDates = new Set();
 let totalSpent = 0;
 let maxSpent = 0;
 let maxSpentDate = "";
 let daysWithExpenses = new Set();
+let savingsMap = {};
 
-for (let exp of allExpenses) {
+for (let exp of expenses) {
   allDates.add(exp.date);
   totalSpent += exp.amount;
   if (!savingsMap[exp.date]) savingsMap[exp.date] = 0;
@@ -341,6 +360,8 @@ for (let exp of allExpenses) {
   }
   daysWithExpenses.add(exp.date);
 }
+
+
 
 let numDays = allDates.size;
 let avgSpent = numDays > 0 ? (totalSpent / numDays).toFixed(2) : 0;
@@ -361,8 +382,67 @@ document.getElementById("stats").innerHTML = `
 `;
 
 
+const salary = parseFloat(localStorage.getItem("saved_salary")) || 0;
+const expensesBase = parseFloat(localStorage.getItem("saved_expenses")) || 0;
+
+document.getElementById("settings-card").innerHTML = `
+  <div style="background:#fff3e0; border-radius:8px; padding:12px; margin-top:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+    <b>⚙️ بياناتك الأساسية:</b><br><br>
+    💰 <b>الراتب:</b> ${salary} دينار<br>
+    📋 <b>الالتزامات:</b> ${expensesBase} دينار<br><br>
+    <div style="display:flex; gap:10px; flex-direction:column; margin-top:10px;">
+  <button onclick="editSettings()" style="
+    background: linear-gradient(to right, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+  ">✏️ تعديل البيانات</button>
+
+  <button onclick="deleteSettings()" style="
+    background: linear-gradient(to right, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+  ">🗑️ حذف البيانات</button>
+</div>
+
+  </div>
+`;
+
+
     }
 
+
+
+    function editSettings() {
+  const newSalary = prompt("💰 أدخل الراتب الجديد:", localStorage.getItem("saved_salary"));
+  const newExpenses = prompt("📋 أدخل الالتزامات الجديدة:", localStorage.getItem("saved_expenses"));
+  
+  if (!newSalary || isNaN(newSalary) || newSalary <= 0) return;
+  if (!newExpenses || isNaN(newExpenses) || newExpenses < 0) return;
+
+  document.getElementById("salary").value = newSalary;
+  document.getElementById("expenses").value = newExpenses;
+  calculate(); // يعيد الحساب والتخزين
+}
+
+function deleteSettings() {
+  if (confirm("هل تريد حذف الراتب والالتزامات؟ سيتم إعادة ضبط الحساب.")) {
+    localStorage.removeItem("saved_salary");
+    localStorage.removeItem("saved_expenses");
+    location.reload();
+  }
+}
 
 
     function deleteExpense(date, index) {
@@ -414,6 +494,9 @@ function editExpense(date, index) {
 
     // عند تحميل الصفحة
     window.onload = updateUI;
+    document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
+document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
+
   </script>
 </body>
 </html>
