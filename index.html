@@ -5,11 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <!-- تحسين تحميل الصفحة للموبايل -->
 <meta name="theme-color" content="#f2f5f8" />
-<link rel="preload" as="script" href="main.js">
-<link rel="preload" as="style" href="style.css">
+
 
   <title>إدارة المصاريف الشخصية</title>
   <style>
+
+#custom-modal {
+  display: none; /* 👈 اجعلها None بدل Flex هنا */
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+
+#custom-modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+#custom-modal-message {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#custom-modal-ok {
+  background-color: #27ae60;
+  color: white;
+}
+
+#custom-modal-cancel {
+  background-color: #e74c3c;
+  color: white;
+}
+
     body {
       font-family: 'Arial', sans-serif;
       background-color: #f2f5f8;
@@ -104,6 +157,59 @@
   font-size: 14px;
 }
 
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+  .container {
+    padding: 15px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  button {
+    font-size: 14px;
+    padding: 8px;
+  }
+  .result, .summary {
+    font-size: 16px;
+  }
+  .expense-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.4);
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+
   </style>
 </head>
 <body>
@@ -149,10 +255,51 @@
     <small>سيتم خصم هذا المبلغ من مصروفك الشهري وتوفيره تلقائيًا.</small>
 
 
+    <button id="restore-btn" onclick="restoreBackup()" style="
+  display:none;
+  background-color: #3498db;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+">
+📦 استرجاع آخر بيانات تم حذفها
+</button>
+
     <!-- زر إعادة التهيئة -->
     <button style="background-color: #e74c3c;" onclick="resetData()">♻️ إعادة ضبط البيانات</button>
 
   </div>
+
+    <div id="custom-modal">
+  <div id="custom-modal-content">
+    <p id="custom-modal-message"></p>
+    <div class="modal-buttons">
+      <button id="custom-modal-ok">موافق</button>
+      <button id="custom-modal-cancel">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تعديل البيانات -->
+<div id="edit-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>✏️ تعديل البيانات</h3>
+    <label>💰 الراتب الجديد:</label>
+    <input type="number" id="edit-salary" placeholder="أدخل الراتب الجديد">
+    <label>📋 الالتزامات الجديدة:</label>
+    <input type="number" id="edit-expenses" placeholder="أدخل الالتزامات الجديدة">
+    <div class="modal-buttons">
+      <button onclick="saveEdits()">💾 حفظ</button>
+      <button onclick="closeEditModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 
   <script>
 
@@ -214,6 +361,7 @@ function addExtra() {
   if (!amount || amount <= 0) return;
 
   const today = new Date().toISOString().split("T")[0]; // يعطيك YYYY-MM-DD بشكل مضمون
+  const todayName = getArabicDayName(today);
   let extras = JSON.parse(localStorage.getItem("extra_income")) || {};
   extras[today] = (extras[today] || 0) + amount;
   localStorage.setItem("extra_income", JSON.stringify(extras));
@@ -288,15 +436,43 @@ document.getElementById("result").innerHTML = `
 
       document.getElementById("remaining").innerText = `💰 المتبقي اليوم: ${remainingToday} دينار`;
 
-      // عرض تنبيهات بناءً على السلوك اليومي
 let alertMessage = "";
 if (remainingToday < 0) {
-  alertMessage = `⚠️ لقد تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingToday)} دينار`;
+  alertMessage = `
+    <div style="
+      background-color: #fdecea;
+      color: #c0392b;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    ">
+      ⚠️ لقد تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingToday)} دينار
+    </div>
+  `;
+  if (Notification.permission === "granted") {
+    new Notification(`⚠️ تجاوزت المصروف بـ ${Math.abs(remainingToday)} دينار`);
+  }
 } else if (remainingToday > 0) {
-  alertMessage = `✅ ممتاز! وفّرت ${remainingToday} دينار اليوم`;
+  alertMessage = `
+    <div style="
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    ">
+      ✅ ممتاز! وفّرت ${remainingToday} دينار اليوم
+    </div>
+  `;
 }
+document.getElementById("remaining").innerHTML += alertMessage;
 
-document.getElementById("remaining").innerHTML += `<br>${alertMessage}`;
 
 
       // عرض المصاريف مفصولة حسب اليوم
@@ -334,11 +510,34 @@ card.appendChild(title);
   let alert = "";
 
 
-  if (remainingThatDay < 0) {
-    alert = `<div style="color: #c0392b; margin-top: 5px;">⚠️ لقد تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingThatDay)} دينار</div>`;
-  } else if (remainingThatDay > 0) {
-    alert = `<div style="color: #27ae60; margin-top: 5px;">✅ ممتاز! وفّرت ${remainingThatDay} دينار في هذا اليوم</div>`;
-  }
+if (remainingThatDay < 0) {
+  alert = `
+    <div style="
+      background-color: #fdecea;
+      color: #c0392b;
+      padding: 6px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-size: 14px;
+    ">
+      ⚠️ تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingThatDay)} دينار
+    </div>
+  `;
+} else if (remainingThatDay > 0) {
+  alert = `
+    <div style="
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      padding: 6px;
+      border-radius: 6px;
+      margin-top: 6px;
+      font-size: 14px;
+    ">
+      ✅ وفّرت ${remainingThatDay} دينار في هذا اليوم
+    </div>
+  `;
+}
+
 
 
 
@@ -501,11 +700,13 @@ document.getElementById("settings-card").innerHTML = `
 }
 
 function deleteSettings() {
-  if (confirm("هل تريد حذف الراتب والالتزامات؟ سيتم إعادة ضبط الحساب.")) {
-    localStorage.removeItem("saved_salary");
-    localStorage.removeItem("saved_expenses");
-    location.reload();
-  }
+  showConfirmModal("🗑️ هل تريد حذف الراتب والالتزامات؟ سيتم إعادة ضبط الحساب.", (confirmed) => {
+    if (confirmed) {
+      localStorage.removeItem("saved_salary");
+      localStorage.removeItem("saved_expenses");
+      location.reload();
+    }
+  });
 }
 
 
@@ -528,6 +729,29 @@ function deleteSettings() {
   updateUI();
 }
 
+function editSettings() {
+  document.getElementById("edit-salary").value = localStorage.getItem("saved_salary") || "";
+  document.getElementById("edit-expenses").value = localStorage.getItem("saved_expenses") || "";
+  document.getElementById("edit-modal").style.display = "flex";
+}
+
+function closeEditModal() {
+  document.getElementById("edit-modal").style.display = "none";
+}
+
+function saveEdits() {
+  const salary = parseFloat(document.getElementById("edit-salary").value);
+  const expenses = parseFloat(document.getElementById("edit-expenses").value);
+  if (!salary || salary <= 0 || isNaN(salary)) return alert("❌ أدخل راتب صالح");
+  if (expenses < 0 || isNaN(expenses)) return alert("❌ أدخل التزامات صالحة");
+
+  document.getElementById("salary").value = salary;
+  document.getElementById("expenses").value = expenses;
+  closeEditModal();
+  calculate();
+}
+
+
 function editExpense(date, index) {
   let newAmount = prompt("أدخل القيمة الجديدة:");
   if (!newAmount || isNaN(newAmount) || newAmount <= 0) return;
@@ -548,24 +772,94 @@ function editExpense(date, index) {
   updateUI();
 }
 
+function showConfirmModal(message, onConfirm) {
+  const modal = document.getElementById("custom-modal");
+  const messageBox = document.getElementById("custom-modal-message");
+  const okBtn = document.getElementById("custom-modal-ok");
+  const cancelBtn = document.getElementById("custom-modal-cancel");
 
-    function resetData() {
-      if (confirm("هل أنت متأكد أنك تريد حذف جميع البيانات؟")) {
-        localStorage.clear();
-        location.reload();
-      }
+  messageBox.textContent = message;
+  modal.style.display = "flex";
+
+  const cleanup = () => {
+    modal.style.display = "none";
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
+  };
+
+  okBtn.onclick = () => {
+    cleanup();
+    onConfirm(true);
+  };
+
+  cancelBtn.onclick = () => {
+    cleanup();
+    onConfirm(false);
+  };
+}
+
+
+function restoreBackup() {
+  showConfirmModal("📦 هل تريد استرجاع البيانات المحذوفة؟", (confirmed) => {
+    if (!confirmed) return;
+
+    const data = JSON.parse(localStorage.getItem("backup_data"));
+    for (let key in data) {
+      if (data[key]) localStorage.setItem(key, data[key]);
     }
+    localStorage.removeItem("backup_data");
+    location.reload();
+  });
+}
 
-    // عند تحميل الصفحة
-    document.addEventListener("DOMContentLoaded", () => {
+
+
+   function resetData() {
+  showConfirmModal("هل أنت متأكد أنك تريد حذف جميع البيانات؟", (confirmed) => {
+    if (confirmed) {
+      const backup = {
+        saved_salary: localStorage.getItem("saved_salary"),
+        saved_expenses: localStorage.getItem("saved_expenses"),
+        daily_limit: localStorage.getItem("daily_limit"),
+        carry: localStorage.getItem("carry"),
+        expenses: localStorage.getItem("expenses"),
+        extra_income: localStorage.getItem("extra_income"),
+        last_date: localStorage.getItem("last_date"),
+        saving_plan: localStorage.getItem("saving_plan"),
+        saving_percent: localStorage.getItem("saving_percent")
+      };
+
+      localStorage.clear();
+      localStorage.setItem("backup_data", JSON.stringify(backup));
+      location.reload();
+    }
+  });
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+ if (Notification.permission !== "granted") {
+  Notification.requestPermission();
+}
+
   updateUI();
   document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
   document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
+
+  // عرض الزر فقط إذا كانت هناك نسخة احتياطية
+  if (localStorage.getItem("backup_data")) {
+    document.getElementById("restore-btn").style.display = "block";
+  }
 });
 
-    document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
-document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
+
+//     document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
+// document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
 
   </script>
+
+
+
+
 </body>
 </html>
