@@ -150,6 +150,21 @@
   </div>
 
   <script>
+
+function getArabicDayName(dateString) {
+  const days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+
+  // استخدم دالة Date مباشرةً بدون split
+  const d = new Date(dateString);
+  if (isNaN(d.getDay())) return "❓"; // احتياط لو التاريخ غير صالح
+
+  return days[d.getDay()];
+}
+
+
+
+
+
 function calculate() {
   const salary = parseFloat(document.getElementById("salary").value) || 0;
   const expenses = parseFloat(document.getElementById("expenses").value) || 0;
@@ -193,7 +208,7 @@ function addExtra() {
   const amount = parseFloat(document.getElementById("extra-today").value);
   if (!amount || amount <= 0) return;
 
-  const today = new Date().toLocaleDateString();
+  const today = new Date().toISOString().split("T")[0]; // يعطيك YYYY-MM-DD بشكل مضمون
   let extras = JSON.parse(localStorage.getItem("extra_income")) || {};
   extras[today] = (extras[today] || 0) + amount;
   localStorage.setItem("extra_income", JSON.stringify(extras));
@@ -209,7 +224,7 @@ function addExtra() {
       const amount = parseFloat(document.getElementById("daily-expense").value);
       if (!amount || amount <= 0) return;
 
-      const today = new Date().toLocaleDateString();
+      const today = new Date().toISOString().split("T")[0]; // يعطيك YYYY-MM-DD بشكل مضمون
       let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
       expenses.push({ amount, date: today });
       localStorage.setItem("expenses", JSON.stringify(expenses));
@@ -219,7 +234,7 @@ function addExtra() {
     }
 
     function updateUI() {
-      const today = new Date().toLocaleDateString();
+      const today = new Date().toISOString().split("T")[0]; // يعطيك YYYY-MM-DD بشكل مضمون
       const lastDate = localStorage.getItem("last_date");
       const dailyLimit = parseFloat(localStorage.getItem("daily_limit")) || 0;
       let carry = parseFloat(localStorage.getItem("carry")) || 0;
@@ -292,7 +307,14 @@ expenseContainer.innerHTML = ""; // مسح القديم
 
 Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
   const card = document.createElement("div");
-  card.className = "day-card";
+card.className = "day-card";
+
+const title = document.createElement("h3");
+const dayName = getArabicDayName(date);
+title.textContent = `📅 ${dayName} - ${date}`;
+card.appendChild(title);
+
+
 
    const total = grouped[date].reduce((a, b) => a + b, 0).toFixed(2);
 
