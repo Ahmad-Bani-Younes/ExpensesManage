@@ -432,6 +432,8 @@
       <div id="remaining"></div>
       <div id="expense-list"></div>
       <div id="stats"></div>
+      <div id="weekly-summary" class="stats-card" style="display: none; margin-top: 20px;"></div>
+
       
       <small>سيتم خصم هذا المبلغ من مصروفك الشهري وتوفيره تلقائيًا</small>
     </div>
@@ -473,6 +475,68 @@
   </div>
 
   <script>
+
+
+function generateWeeklySummary() {
+  const expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+  const extras = JSON.parse(localStorage.getItem("extra_income")) || {};
+  const savingPercent = parseFloat(localStorage.getItem("saving_percent")) || 0;
+  
+  const now = new Date();
+  const currentDay = now.getDay(); // 0 = الأحد
+  if (currentDay !== 0 && currentDay !== 6) return; // فقط يوم الأحد أو السبت
+
+  const todayDate = now.toISOString().split("T")[0];
+  const lastSummaryDate = localStorage.getItem("last_weekly_summary");
+  if (lastSummaryDate === todayDate) return; // لا تكرّر التلخيص في نفس اليوم
+
+  const start = new Date(now);
+  start.setDate(now.getDate() - 6); // من 6 أيام ماضية
+
+  let total = 0, maxSpent = 0, maxDate = "";
+  let saving = 0;
+
+  const dayTotals = {};
+
+  for (let e of expenses) {
+    const d = new Date(e.date);
+    if (d >= start && d <= now) {
+      total += e.amount;
+      if (!dayTotals[e.date]) dayTotals[e.date] = 0;
+      dayTotals[e.date] += e.amount;
+    }
+  }
+
+  for (let d in dayTotals) {
+    if (dayTotals[d] > maxSpent) {
+      maxSpent = dayTotals[d];
+      maxDate = d;
+    }
+  }
+
+  for (let date in extras) {
+    const d = new Date(date);
+    if (d >= start && d <= now) {
+      saving += (extras[date] * savingPercent / 100);
+    }
+  }
+
+  const dayName = getArabicDayName(maxDate);
+  const message = `
+    <h3 class="section-title"><i>📊</i> <span>ملخص الأسبوع</span></h3>
+    <div class="stat-item">🧾 مجموع المصاريف: <b>${total.toFixed(2)} دينار</b></div>
+    <div class="stat-item">💰 المبلغ الموفّر: <b>${saving.toFixed(2)} دينار</b></div>
+    <div class="stat-item">🔥 اليوم الأعلى صرفًا: <b>${dayName} (${maxSpent.toFixed(2)} د)</b></div>
+    <div class="stat-item">👏 استمر في التنظيم!</div>
+  `;
+
+  const box = document.getElementById("weekly-summary");
+  box.innerHTML = message;
+  box.style.display = "block";
+
+  localStorage.setItem("last_weekly_summary", todayDate);
+}
+
     // جميع الدوال والوظائف تبقى كما هي بدون أي تغيير
     function getArabicDayName(dateString) {
       const days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -973,6 +1037,7 @@ function showInputModal(message, defaultValue, onConfirm) {
       }
 
       updateUI();
+      generateWeeklySummary();
       document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
       document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
 
