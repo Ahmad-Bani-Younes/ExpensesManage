@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- تحسين تحميل الصفحة للموبايل -->
+<meta name="theme-color" content="#f2f5f8" />
+<link rel="preload" as="script" href="main.js">
+<link rel="preload" as="style" href="style.css">
+
   <title>إدارة المصاريف الشخصية</title>
   <style>
     body {
@@ -327,6 +332,8 @@ card.appendChild(title);
 
   const remainingThatDay = (limitThatDay - total).toFixed(2);
   let alert = "";
+
+
   if (remainingThatDay < 0) {
     alert = `<div style="color: #c0392b; margin-top: 5px;">⚠️ لقد تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingThatDay)} دينار</div>`;
   } else if (remainingThatDay > 0) {
@@ -348,9 +355,30 @@ card.appendChild(title);
     card.appendChild(item);
   });
 
-   const totalRow = document.createElement("div");
-  totalRow.style.marginTop = "8px";
-  totalRow.innerHTML = `🔢 مجموع اليوم: <b>${total} دينار</b> ${alert}`;
+const totalRow = document.createElement("div");
+totalRow.style.marginTop = "8px";
+
+let extraInfo = "";
+if (extraForDay > 0) {
+  extraInfo += `💼 دخل إضافي في هذا اليوم: ${extraForDay} دينار<br>`;
+}
+if (date === today && carry > 0) {
+  extraInfo += `🔁 مبلغ مرحل: ${carry.toFixed(2)} دينار<br>`;
+}
+
+
+const effectiveLimitThatDay = limitThatDay.toFixed(2);
+
+totalRow.innerHTML = `
+  <div style="margin-bottom:5px; font-size:14px; color:#2c3e50;">
+    💰 <b>المصروف المتاح في هذا اليوم:</b> ${effectiveLimitThatDay} دينار
+  </div>
+  🔢 مجموع اليوم: <b>${total} دينار</b> ${alert}
+  <div style="margin-top:5px; font-size:14px; color:#555;">
+    ${extraInfo}
+  </div>
+`;
+
   card.appendChild(totalRow);
 
 
@@ -529,7 +557,12 @@ function editExpense(date, index) {
     }
 
     // عند تحميل الصفحة
-    window.onload = updateUI;
+    document.addEventListener("DOMContentLoaded", () => {
+  updateUI();
+  document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
+  document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
+});
+
     document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
 document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
 
