@@ -585,7 +585,7 @@ function generateWeeklySummary() {
       const amount = parseFloat(document.getElementById("extra-today").value);
       if (!amount || amount <= 0) return;
 
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString('en-CA')
       const todayName = getArabicDayName(today);
       let extras = JSON.parse(localStorage.getItem("extra_income")) || {};
       extras[today] = (extras[today] || 0) + amount;
@@ -599,7 +599,7 @@ function generateWeeklySummary() {
       const amount = parseFloat(document.getElementById("daily-expense").value);
       if (!amount || amount <= 0) return;
 
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString('en-CA')
       let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
       expenses.push({ amount, date: today });
       localStorage.setItem("expenses", JSON.stringify(expenses));
@@ -609,7 +609,7 @@ function generateWeeklySummary() {
     }
 
     function updateUI() {
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString('en-CA')
       const lastDate = localStorage.getItem("last_date");
       const dailyLimit = parseFloat(localStorage.getItem("daily_limit")) || 0;
       let carry = parseFloat(localStorage.getItem("carry")) || 0;
