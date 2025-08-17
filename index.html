@@ -1,1050 +1,796 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#4a6fa5" />
-  <title>إدارة المصاريف الشخصية</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #4a6fa5;
-      --secondary-color: #166088;
-      --accent-color: #4fc3f7;
-      --success-color: #2e7d32;
-      --warning-color: #ff8f00;
-      --danger-color: #c62828;
-      --light-color: #f8f9fa;
-      --dark-color: #2c3e50;
-      --text-color: #333;
-      --border-radius: 12px;
-      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      --transition: all 0.3s ease;
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Tajawal', sans-serif;
-      background-color: #f5f7fa;
-      color: var(--text-color);
-      line-height: 1.6;
-      padding: 20px;
-      direction: rtl;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 25px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      height: 8px;
-      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-    }
-    
-    h1 {
-      text-align: center;
-      color: var(--primary-color);
-      margin-bottom: 25px;
-      font-weight: 700;
-      font-size: 28px;
-      position: relative;
-      padding-bottom: 10px;
-    }
-    
-    h1::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      right: 50%;
-      transform: translateX(50%);
-      width: 80px;
-      height: 3px;
-      background: var(--accent-color);
-      border-radius: 3px;
-    }
-    
-    .section {
-      margin-bottom: 25px;
-      padding: 20px;
-      background: var(--light-color);
-      border-radius: var(--border-radius);
-      border-left: 4px solid var(--primary-color);
-    }
-    
-    .section-title {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-      color: var(--primary-color);
-      font-weight: 500;
-    }
-    
-    .section-title i {
-      margin-left: 8px;
-      font-size: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--dark-color);
-    }
-    
-    input {
-      width: 100%;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: var(--border-radius);
-      font-family: 'Tajawal', sans-serif;
-      font-size: 16px;
-      transition: var(--transition);
-      margin-bottom: 15px;
-    }
-    
-    input:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
-    }
-    
-    button {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: var(--border-radius);
-      font-family: 'Tajawal', sans-serif;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    
-    button:hover {
-      background-color: var(--secondary-color);
-      transform: translateY(-2px);
-    }
-    
-    button i {
-      margin-left: 8px;
-    }
-    
-    .btn-danger {
-      background-color: var(--danger-color);
-    }
-    
-    .btn-danger:hover {
-      background-color: #b71c1c;
-    }
-    
-    .btn-success {
-      background-color: var(--success-color);
-    }
-    
-    .btn-success:hover {
-      background-color: #1b5e20;
-    }
-    
-    .btn-info {
-      background-color: var(--accent-color);
-      color: var(--dark-color);
-    }
-    
-    .btn-info:hover {
-      background-color: #03a9f4;
-    }
-    
-    .result-card {
-      background: white;
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: var(--box-shadow);
-      border-top: 3px solid var(--primary-color);
-    }
-    
-    .result-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px dashed #eee;
-    }
-    
-    .result-item:last-child {
-      border-bottom: none;
-    }
-    
-    .alert {
-      padding: 12px;
-      border-radius: var(--border-radius);
-      margin: 15px 0;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-    }
-    
-    .alert-success {
-      background-color: #e8f5e9;
-      color: var(--success-color);
-      border-right: 3px solid var(--success-color);
-    }
-    
-    .alert-warning {
-      background-color: #fff3e0;
-      color: var(--warning-color);
-      border-right: 3px solid var(--warning-color);
-    }
-    
-    .alert-danger {
-      background-color: #ffebee;
-      color: var(--danger-color);
-      border-right: 3px solid var(--danger-color);
-    }
-    
-    .day-card {
-      background-color: white;
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: var(--box-shadow);
-      border: 1px solid #eee;
-    }
-    
-    .day-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .day-title {
-      color: var(--primary-color);
-      font-weight: 500;
-    }
-    
-    .expense-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-    
-    .expense-actions button {
-      background: none;
-      border: none;
-      color: var(--text-color);
-      cursor: pointer;
-      margin: 0 5px;
-      width: auto;
-      padding: 5px;
-    }
-    
-    .expense-actions button:hover {
-      transform: scale(1.1);
-    }
-    
-    .day-summary {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed #ddd;
-      font-size: 14px;
-    }
-    
-    .stats-card {
-      background: white;
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin-top: 20px;
-      box-shadow: var(--box-shadow);
-    }
-    
-    .stat-item {
-      margin-bottom: 10px;
-    }
-    
-    small {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      color: #777;
-      font-size: 13px;
-    }
-    
-    /* Modal Styles */
-    #custom-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      right: 0;
-      left: 0;
-      bottom: 0;
-      background-color: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    
-    #custom-modal-content {
-      background-color: #fff;
-      padding: 25px;
-      border-radius: var(--border-radius);
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-      text-align: center;
-    }
-    
-    #custom-modal-message {
-      font-size: 16px;
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-    
-    .modal-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-    
-    .modal-buttons button {
-      flex: 1;
-      margin: 0;
-    }
-    
-    #edit-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background-color: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    
-    .edit-modal-content {
-      background: white;
-      padding: 25px;
-      border-radius: var(--border-radius);
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    }
-    
-    .edit-modal-content h3 {
-      color: var(--primary-color);
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    
-    @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-      
-      .container {
-        padding: 15px;
-      }
-      
-      h1 {
-        font-size: 24px;
-      }
-      
-      .section {
-        padding: 15px;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#4a6fa5" />
+<title>إدارة المصاريف الشخصية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#4a6fa5;--secondary:#166088;--accent:#4fc3f7;--success:#2e7d32;--warning:#ff8f00;--danger:#c62828;
+  --light:#f5f7fa;--white:#fff;--text:#333;--muted:#667085;--border:#e5e7eb;
+  --radius:12px;--shadow:0 4px 12px rgba(0,0,0,.08);--trans:all .25s ease;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--light);color:var(--text);padding:20px;line-height:1.6}
+.container{max-width:900px;margin:auto;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;position:relative;overflow:hidden}
+.container::before{content:'';position:absolute;top:0;right:0;width:100%;height:8px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+h1{color:var(--primary);text-align:center;margin-bottom:18px;font-size:26px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.section{background:#fafbff;border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.section-title{display:flex;align-items:center;gap:8px;color:var(--primary);font-weight:700;margin-bottom:10px}
+label{display:block;margin:.5rem 0 .25rem 0;font-weight:500}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;transition:var(--trans);background:#fff}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,195,247,.18)}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+button{appearance:none;border:none;border-radius:10px;padding:12px;cursor:pointer;font-weight:700;transition:var(--trans)}
+.btn{background:var(--primary);color:#fff}
+.btn:hover{background:var(--secondary);transform:translateY(-1px)}
+.btn-success{background:var(--success);color:#fff}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-ghost{background:#eef2ff;color:#1e293b}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#fff;color:#475569}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:12px}
+.muted{color:var(--muted);font-size:13px}
+.result-card{border-top:3px solid var(--primary)}
+.kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
+.kv:last-child{border-bottom:none}
+.alert{padding:10px;border-radius:10px;margin:10px 0;font-weight:600;display:flex;gap:8px;align-items:center}
+.alert-success{background:#e8f5e9;color:var(--success);border-right:3px solid var(--success)}
+.alert-warning{background:#fff3e0;color:var(--warning);border-right:3px solid var(--warning)}
+.alert-danger{background:#ffebee;color:var(--danger);border-right:3px solid var(--danger)}
+.day-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:12px;padding:12px}
+.day-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:8px}
+.expense-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f8fafc;border:1px dashed #e5e7eb;padding:8px;border-radius:10px;margin-bottom:6px}
+.expense-meta{font-size:13px;color:#475569}
+.actions button{background:transparent;color:#0f172a;padding:6px 8px}
+.progress{height:8px;border-radius:999px;background:#eef2ff;overflow:hidden}
+.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.small{font-size:12px;color:#64748b}
+.hr{height:1px;background:#eee;margin:10px 0}
+#chartWrap{padding:12px}
+#chart{width:100%;height:200px}
+.switch{display:inline-flex;align-items:center;gap:8px}
+.switch input{width:auto}
+.dark body{background:#0b1220;color:#e2e8f0}
+.dark .container{background:#0f172a}
+.dark .section,.dark .card,.dark .day-card{background:#0b1220;border-color:#1e293b}
+.dark input,.dark select,.dark textarea{background:#0b1220;border-color:#1e293b;color:#e2e8f0}
+.dark .btn-ghost{background:#111827;color:#e5e7eb}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>تطبيق إدارة المصاريف</h1>
-    
+<div class="container">
+  <h1>تطبيق إدارة المصاريف</h1>
+
+  <!-- شريط أدوات أعلى -->
+  <div class="toolbar">
+    <span class="badge">📅 <span id="todayLabel"></span></span>
+    <span class="badge">🗓️ الشهر: <span id="monthLabel"></span></span>
+    <label class="switch"><input type="checkbox" id="darkToggle"> الوضع الداكن</label>
+    <button class="btn-ghost" id="printBtn">🖨️ طباعة التقرير</button>
+    <button class="btn-ghost" id="exportCsvBtn">⬇️ CSV</button>
+    <button class="btn-ghost" id="exportJsonBtn">⬇️ JSON</button>
+    <label class="btn-ghost" style="cursor:pointer">
+      ⬆️ استيراد JSON
+      <input type="file" id="importJsonInput" accept=".json" style="display:none">
+    </label>
+  </div>
+
+  <div class="grid">
+    <!-- البيانات الأساسية -->
     <div class="section">
-      <div class="section-title">
-        <i>💰</i>
-        <span>البيانات الأساسية</span>
+      <div class="section-title">💰 البيانات الأساسية</div>
+      <div class="row">
+        <div>
+          <label for="salary">الراتب الشهري</label>
+          <input type="number" id="salary" placeholder="مثال: 700" min="0" step="0.01">
+        </div>
+        <div>
+          <label for="fixed">الالتزامات الشهرية</label>
+          <input type="number" id="fixed" placeholder="مثال: 250" min="0" step="0.01">
+        </div>
       </div>
-      <label for="salary">الراتب الشهري</label>
-      <input type="number" id="salary" placeholder="أدخل راتبك الشهري">
-      
-      <label for="expenses">الالتزامات الشهرية</label>
-      <input type="number" id="expenses" placeholder="أدخل التزاماتك الشهرية">
-      
-      <button onclick="calculate()" class="btn-success">
-        <i>🧮</i>
-        <span>احسب المصروف اليومي</span>
-      </button>
-      
-      <div id="settings-card"></div>
-      <div id="result"></div>
+      <button class="btn-success" id="calcBtn">🧮 احسب المصروف اليومي</button>
+      <div id="settingsCard" class="card result-card" style="margin-top:10px"></div>
     </div>
-    
+
+    <!-- إدارة اليوم -->
     <div class="section">
-      <div class="section-title">
-        <i>💸</i>
-        <span>إدارة المصروف اليومي</span>
+      <div class="section-title">💸 إدارة المصروف اليومي</div>
+      <div class="row">
+        <div>
+          <label for="extra">الدخل الإضافي اليوم</label>
+          <input type="number" id="extra" placeholder="مثال: 10" min="0" step="0.01">
+        </div>
+        <div style="align-self:end">
+          <button class="btn" id="addExtraBtn">➕ أضف الدخل الإضافي</button>
+        </div>
       </div>
-      
-      <label for="extra-today">الدخل الإضافي اليوم</label>
-      <input type="number" id="extra-today" placeholder="أدخل الدخل الإضافي">
-      <button onclick="addExtra()" class="btn-info">
-        <i>➕</i>
-        <span>أضف الدخل الإضافي</span>
-      </button>
-      
-      <label for="daily-expense">مصروف اليوم</label>
-      <input type="number" id="daily-expense" placeholder="أدخل مصروف اليوم">
-      <button onclick="addExpense()" class="btn-info">
-        <i>➕</i>
-        <span>أضف المصروف</span>
-      </button>
-      
-      <div id="remaining"></div>
-      <div id="expense-list"></div>
-      <div id="stats"></div>
-      <div id="weekly-summary" class="stats-card" style="display: none; margin-top: 20px;"></div>
 
-      
-      <small>سيتم خصم هذا المبلغ من مصروفك الشهري وتوفيره تلقائيًا</small>
-    </div>
-    
-    <button id="restore-btn" onclick="restoreBackup()" class="btn-info" style="display:none;">
-      <i>🔄</i>
-      <span>استرجاع آخر بيانات تم حذفها</span>
-    </button>
-    
-    <button onclick="resetData()" class="btn-danger">
-      <i>♻️</i>
-      <span>إعادة ضبط البيانات</span>
-    </button>
-  </div>
-  
-  <!-- Modal Dialogs -->
-  <div id="custom-modal">
-    <div id="custom-modal-content">
-      <p id="custom-modal-message"></p>
-      <div class="modal-buttons">
-        <button id="custom-modal-ok" class="btn-success">موافق</button>
-        <button id="custom-modal-cancel" class="btn-danger">إلغاء</button>
+      <div class="row">
+        <div>
+          <label for="amount">مصروف اليوم</label>
+          <input type="number" id="amount" placeholder="مثال: 5.75" min="0" step="0.01">
+        </div>
+        <div>
+          <label for="category">التصنيف</label>
+          <select id="category">
+            <option value="عام">عام</option>
+            <option value="طعام">طعام</option>
+            <option value="نقل">نقل</option>
+            <option value="فواتير">فواتير</option>
+            <option value="ترفيه">ترفيه</option>
+            <option value="صحة">صحة</option>
+            <option value="تعليم">تعليم</option>
+          </select>
+        </div>
       </div>
-    </div>
-  </div>
-  
-  <div id="edit-modal" class="modal">
-    <div class="edit-modal-content">
-      <h3>✏️ تعديل البيانات الأساسية</h3>
-      <label>الراتب الجديد:</label>
-      <input type="number" id="edit-salary" placeholder="أدخل الراتب الجديد">
-      <label>الالتزامات الجديدة:</label>
-      <input type="number" id="edit-expenses" placeholder="أدخل الالتزامات الجديدة">
-      <div class="modal-buttons">
-        <button onclick="saveEdits()" class="btn-success">حفظ التعديلات</button>
-        <button onclick="closeEditModal()" class="btn-danger">إلغاء</button>
+      <label for="note">ملاحظة (اختياري)</label>
+      <input id="note" placeholder="مثال: غداء عمل / سوبرماركت / ...">
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="addExpenseBtn">🧾 أضف المصروف</button>
+        <button class="btn-warning" id="clearTodayBtn">🧹 تنظيف مصاريف اليوم فقط</button>
       </div>
+
+      <div id="todayPanel" class="card result-card" style="margin-top:10px"></div>
     </div>
   </div>
 
-  <script>
+  <!-- ملخصات وفلترة -->
+  <div class="grid" style="margin-top:16px">
+    <div class="section">
+      <div class="section-title">📊 إحصائيات وملخص</div>
+      <div id="stats" class="card"></div>
+      <div id="chartWrap" class="card">
+        <canvas id="chart"></canvas>
+        <div class="small">رسم بياني لآخر 7 أيام</div>
+      </div>
+      <div id="weeklySummary" class="card" style="display:none"></div>
+    </div>
 
+    <div class="section">
+      <div class="section-title">🔎 فلترة وعرض</div>
+      <div class="row">
+        <div>
+          <label for="fromDate">من تاريخ</label>
+          <input type="date" id="fromDate">
+        </div>
+        <div>
+          <label for="toDate">إلى تاريخ</label>
+          <input type="date" id="toDate">
+        </div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="applyFilterBtn">تطبيق الفلترة</button>
+        <button class="btn-ghost" id="resetFilterBtn">مسح الفلترة</button>
+      </div>
 
-function generateWeeklySummary() {
-  const expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-  const extras = JSON.parse(localStorage.getItem("extra_income")) || {};
-  const savingPercent = parseFloat(localStorage.getItem("saving_percent")) || 0;
-  
-  const now = new Date();
-  const currentDay = now.getDay(); // 0 = الأحد
-  if (currentDay !== 0 && currentDay !== 6) return; // فقط يوم الأحد أو السبت
+      <div class="hr"></div>
 
-  const todayDate = now.toISOString().split("T")[0];
-  const lastSummaryDate = localStorage.getItem("last_weekly_summary");
-  if (lastSummaryDate === todayDate) return; // لا تكرّر التلخيص في نفس اليوم
+      <div class="section-title">🎯 ميزانيات التصنيفات</div>
+      <div class="row">
+        <select id="budgetCat">
+          <option value="عام">عام</option><option value="طعام">طعام</option><option value="نقل">نقل</option>
+          <option value="فواتير">فواتير</option><option value="ترفيه">ترفيه</option>
+          <option value="صحة">صحة</option><option value="تعليم">تعليم</option>
+        </select>
+        <input type="number" id="budgetVal" placeholder="ميزانية شهرية للتصنيف" min="0" step="0.01">
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="saveBudgetBtn">💾 حفظ الميزانية</button>
+        <button class="btn-ghost" id="clearBudgetsBtn">🗑️ حذف كل الميزانيات</button>
+      </div>
 
-  const start = new Date(now);
-  start.setDate(now.getDate() - 6); // من 6 أيام ماضية
+      <div id="budgetsView" class="card" style="margin-top:10px"></div>
+    </div>
+  </div>
 
-  let total = 0, maxSpent = 0, maxDate = "";
-  let saving = 0;
+  <!-- قائمة الأيام -->
+  <div class="section" style="margin-top:16px">
+    <div class="section-title">📅 السجل اليومي</div>
+    <div id="expenseList"></div>
+  </div>
 
-  const dayTotals = {};
+  <div class="toolbar" style="justify-content:space-between;margin-top:10px">
+    <button class="btn-ghost" id="restoreBtn" style="display:none">🔄 استرجاع آخر نسخة احتياطية</button>
+    <button class="btn-danger" id="resetBtn">♻️ إعادة ضبط كل البيانات</button>
+  </div>
+</div>
 
-  for (let e of expenses) {
-    const d = new Date(e.date);
-    if (d >= start && d <= now) {
-      total += e.amount;
-      if (!dayTotals[e.date]) dayTotals[e.date] = 0;
-      dayTotals[e.date] += e.amount;
-    }
-  }
+<!-- حوارات بسيطة -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);justify-content:center;align-items:center;z-index:9999">
+  <div style="background:#fff;padding:20px;border-radius:12px;max-width:380px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,.2)">
+    <div id="confirmMsg" style="margin-bottom:14px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-success" id="confirmOk">موافق</button>
+      <button class="btn-danger" id="confirmCancel">إلغاء</button>
+    </div>
+  </div>
+</div>
 
-  for (let d in dayTotals) {
-    if (dayTotals[d] > maxSpent) {
-      maxSpent = dayTotals[d];
-      maxDate = d;
-    }
-  }
+<script>
+/* ---------- أدوات تاريخ ---------- */
+const fmtDate = (d)=>{ // ISO بدون توقيت
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+};
+const parseISO = (s)=> new Date(`${s}T00:00:00`);
+const daysAr = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const dayName = (iso)=>{ const d=parseISO(iso); return isNaN(d)?'❓':daysAr[d.getDay()] };
+const daysInMonth = (y,m)=> new Date(y,m,0).getDate(); // m=1..12
 
-  for (let date in extras) {
-    const d = new Date(date);
-    if (d >= start && d <= now) {
-      saving += (extras[date] * savingPercent / 100);
-    }
-  }
+/* ---------- مفاتيح التخزين ---------- */
+const K = {
+  salary:'saved_salary', fixed:'saved_expenses', daily:'daily_limit', plan:'saving_plan',
+  percent:'saving_percent', last:'last_date', carry:'carry', exps:'expenses',
+  extra:'extra_income', budgets:'category_budgets', backup:'backup_data', monthKey:'active_month'
+};
 
-  const dayName = getArabicDayName(maxDate);
-  const message = `
-    <h3 class="section-title"><i>📊</i> <span>ملخص الأسبوع</span></h3>
-    <div class="stat-item">🧾 مجموع المصاريف: <b>${total.toFixed(2)} دينار</b></div>
-    <div class="stat-item">💰 المبلغ الموفّر: <b>${saving.toFixed(2)} دينار</b></div>
-    <div class="stat-item">🔥 اليوم الأعلى صرفًا: <b>${dayName} (${maxSpent.toFixed(2)} د)</b></div>
-    <div class="stat-item">👏 استمر في التنظيم!</div>
-  `;
+/* ---------- أدوات تخزين ---------- */
+const readJSON = (k,def)=>{ try{ return JSON.parse(localStorage.getItem(k)) ?? def }catch{ return def } };
+const writeJSON = (k,val)=> localStorage.setItem(k, JSON.stringify(val));
+const num = (v)=> { const n=parseFloat(v); return isNaN(n)?0:n };
 
-  const box = document.getElementById("weekly-summary");
-  box.innerHTML = message;
-  box.style.display = "block";
-
-  localStorage.setItem("last_weekly_summary", todayDate);
+/* ---------- واجهة بسيطة للتأكيد ---------- */
+function confirmBox(msg, cb){
+  const modal = document.getElementById('confirmModal');
+  document.getElementById('confirmMsg').innerHTML = msg;
+  modal.style.display='flex';
+  const ok = document.getElementById('confirmOk');
+  const cancel = document.getElementById('confirmCancel');
+  const clean = ()=>{ modal.style.display='none'; ok.onclick=null; cancel.onclick=null; };
+  ok.onclick=()=>{ clean(); cb(true); };
+  cancel.onclick=()=>{ clean(); cb(false); };
 }
 
-    // جميع الدوال والوظائف تبقى كما هي بدون أي تغيير
-    function getArabicDayName(dateString) {
-      const days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-      const d = new Date(dateString);
-      if (isNaN(d.getDay())) return "❓";
-      return days[d.getDay()];
-    }
+/* ---------- تهيئة ---------- */
+const todayISO = fmtDate(new Date());
+document.getElementById('todayLabel').textContent = todayISO;
+document.getElementById('monthLabel').textContent = todayISO.slice(0,7);
 
-   function calculate(isUpdate = false) {
-  const salary = parseFloat(document.getElementById("salary").value) || 0;
-  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
+/* وضع داكن */
+const darkToggle = document.getElementById('darkToggle');
+try{
+  const dark = localStorage.getItem('__dark__')==='1';
+  darkToggle.checked = dark;
+  if(dark) document.documentElement.classList.add('dark');
+}catch{}
+darkToggle.addEventListener('change', ()=>{
+  if(darkToggle.checked){ localStorage.setItem('__dark__','1'); document.documentElement.classList.add('dark'); }
+  else { localStorage.setItem('__dark__','0'); document.documentElement.classList.remove('dark'); }
+});
 
-  localStorage.setItem("saved_salary", salary);
-  localStorage.setItem("saved_expenses", expenses);
+/* إذن التنبيهات (اختياري) */
+if(window.Notification && Notification.permission!=='granted'){ Notification.requestPermission().catch(()=>{}); }
 
-  const totalIncome = salary;
-  const netBeforeSaving = totalIncome - expenses;
+/* ---------- ترحيل بداية الشهر ---------- */
+(function monthRollover(){
+  const currentMonth = todayISO.slice(0,7);
+  const savedMonth = localStorage.getItem(K.monthKey);
+  if(savedMonth && savedMonth!==currentMonth){
+    // لا نمسح السجلات التاريخية، فقط نعيد التهيئة للأشياء اليومية/الشهرية
+    localStorage.setItem(K.carry,'0');
+    writeJSON(K.extra, {}); // دخل إضافي يعاد شهرياً
+  }
+  localStorage.setItem(K.monthKey, currentMonth);
+})();
 
-  let savingPercent = 0;
-  if (netBeforeSaving < 100) savingPercent = 5;
-  else if (netBeforeSaving < 200) savingPercent = 10;
-  else if (netBeforeSaving < 400) savingPercent = 15;
-  else savingPercent = 20;
+/* ---------- حساب المصروف اليومي ---------- */
+function calculate(isUpdate=false){
+  const salary = num(document.getElementById('salary').value);
+  const fixed = num(document.getElementById('fixed').value);
+  if(salary<=0){ alert('❌ أدخل راتباً صالحاً'); return; }
+  if(fixed<0){ alert('❌ أدخل التزامات صالحة'); return; }
 
-  const savingAmount = (totalIncome * savingPercent / 100);
-  const net = totalIncome - expenses - savingAmount;
-  const daily = (net / 30).toFixed(2);
+  localStorage.setItem(K.salary, String(salary));
+  localStorage.setItem(K.fixed, String(fixed));
 
-  localStorage.setItem("daily_limit", daily);
-  localStorage.setItem("saving_plan", savingAmount.toFixed(2));
-  localStorage.setItem("saving_percent", savingPercent);
-  localStorage.setItem("last_date", new Date().toLocaleDateString());
+  const netBeforeSaving = salary - fixed;
+  let p = 0;
+  if(netBeforeSaving < 100) p = 5;
+  else if(netBeforeSaving < 200) p = 10;
+  else if(netBeforeSaving < 400) p = 15;
+  else p = 20;
 
-  if (!isUpdate) {
-    // فقط إعادة التهيئة عند الحساب لأول مرة
-    localStorage.setItem("carry", "0");
-    localStorage.setItem("expenses", JSON.stringify([]));
-    localStorage.setItem("extra_income", JSON.stringify({}));
+  const saveAmt = salary * p / 100;
+  const now = new Date(); const dim = daysInMonth(now.getFullYear(), now.getMonth()+1);
+  const net = salary - fixed - saveAmt;
+  const daily = Math.max(net/dim, 0);
+
+  localStorage.setItem(K.daily, daily.toFixed(2));
+  localStorage.setItem(K.plan, saveAmt.toFixed(2));
+  localStorage.setItem(K.percent, String(p));
+  localStorage.setItem(K.last, todayISO);
+  localStorage.setItem(K.monthKey, todayISO.slice(0,7));
+
+  if(!isUpdate){
+    localStorage.setItem(K.carry,'0');
+    writeJSON(K.exps, readJSON(K.exps, [])); // لا نمسح القديم
+    writeJSON(K.extra, readJSON(K.extra, {}));
   }
 
   updateUI();
 }
 
-
-    function addExtra() {
-      const amount = parseFloat(document.getElementById("extra-today").value);
-      if (!amount || amount <= 0) return;
-
-      const today = new Date().toLocaleDateString('en-CA')
-      const todayName = getArabicDayName(today);
-      let extras = JSON.parse(localStorage.getItem("extra_income")) || {};
-      extras[today] = (extras[today] || 0) + amount;
-      localStorage.setItem("extra_income", JSON.stringify(extras));
-
-      document.getElementById("extra-today").value = "";
-      updateUI();
-    }
-
-    function addExpense() {
-      const amount = parseFloat(document.getElementById("daily-expense").value);
-      if (!amount || amount <= 0) return;
-
-      const today = new Date().toLocaleDateString('en-CA')
-      let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-      expenses.push({ amount, date: today });
-      localStorage.setItem("expenses", JSON.stringify(expenses));
-
-      document.getElementById("daily-expense").value = "";
-      updateUI();
-    }
-
-    function updateUI() {
-      const today = new Date().toLocaleDateString('en-CA')
-      const lastDate = localStorage.getItem("last_date");
-      const dailyLimit = parseFloat(localStorage.getItem("daily_limit")) || 0;
-      let carry = parseFloat(localStorage.getItem("carry")) || 0;
-      let extras = JSON.parse(localStorage.getItem("extra_income")) || {};
-      const extraToday = extras[today] || 0;
-
-      const baseSaving = parseFloat(localStorage.getItem("saving_plan")) || 0;
-      const dynamicSaving = (extraToday * (parseFloat(localStorage.getItem("saving_percent")) || 0) / 100).toFixed(2);
-      const totalSaving = (baseSaving / 30 + parseFloat(dynamicSaving)).toFixed(2);
-      const savingPercent = localStorage.getItem("saving_percent") || 0;
-
-      let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-
-      if (lastDate && lastDate !== today) {
-        const yesterdayExpenses = expenses.filter(e => e.date === lastDate);
-        const spentYesterday = yesterdayExpenses.reduce((sum, e) => sum + e.amount, 0);
-        const saved = Math.max(dailyLimit - spentYesterday, 0);
-        carry += saved;
-        localStorage.setItem("carry", carry.toFixed(2));
-        localStorage.setItem("last_date", today);
-      }
-
-      const todayExpenses = expenses.filter(e => e.date === today);
-      const totalSpentToday = todayExpenses.reduce((sum, e) => sum + e.amount, 0);
-      const effectiveLimit = (dailyLimit + carry + extraToday).toFixed(2);
-      const remainingToday = (effectiveLimit - totalSpentToday).toFixed(2);
-
-      document.getElementById("result").innerHTML = `
-        <div class="result-card">
-          <div class="result-item">
-            <span>المصروف المتاح لليوم:</span>
-            <span><b>${effectiveLimit} دينار</b></span>
-          </div>
-          <div class="result-item">
-            <span>الدخل الإضافي اليوم:</span>
-            <span>${extraToday} دينار</span>
-          </div>
-          <div class="result-item">
-            <span>خطة التوفير (${savingPercent}%):</span>
-            <span>${totalSaving} دينار</span>
-          </div>
-        </div>
-      `;
-
-      let alertMessage = "";
-      if (remainingToday < 0) {
-        alertMessage = `
-          <div class="alert alert-danger">
-            ⚠️ لقد تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingToday)} دينار
-          </div>
-        `;
-        if (Notification.permission === "granted") {
-          new Notification(`⚠️ تجاوزت المصروف بـ ${Math.abs(remainingToday)} دينار`);
-        }
-      } else if (remainingToday > 0) {
-        alertMessage = `
-          <div class="alert alert-success">
-            ✅ ممتاز! وفّرت ${remainingToday} دينار اليوم
-          </div>
-        `;
-      }
-      
-      document.getElementById("remaining").innerHTML = `
-        <div class="result-card">
-          <div class="result-item">
-            <span>المتبقي اليوم:</span>
-            <span><b>${remainingToday} دينار</b></span>
-          </div>
-          ${alertMessage}
-        </div>
-      `;
-
-      const grouped = {};
-      expenses.forEach(e => {
-        if (!grouped[e.date]) grouped[e.date] = [];
-        grouped[e.date].push(e.amount);
-      });
-
-      const expenseContainer = document.getElementById("expense-list");
-      expenseContainer.innerHTML = "";
-
-      Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
-        const card = document.createElement("div");
-        card.className = "day-card";
-
-        const header = document.createElement("div");
-        header.className = "day-header";
-        
-        const title = document.createElement("div");
-        title.className = "day-title";
-        const dayName = getArabicDayName(date);
-        title.textContent = `${dayName} - ${date}`;
-        header.appendChild(title);
-        card.appendChild(header);
-
-        const total = grouped[date].reduce((a, b) => a + b, 0).toFixed(2);
-        const extraForDay = extras[date] || 0;
-        let baseLimit = parseFloat(localStorage.getItem("daily_limit")) || 0;
-        const limitThatDay = (date === today) ? (baseLimit + extraForDay + carry) : (baseLimit + extraForDay);
-        const remainingThatDay = (limitThatDay - total).toFixed(2);
-        let alert = "";
-
-        if (remainingThatDay < 0) {
-          alert = `
-            <div class="alert alert-warning">
-              ⚠️ تجاوزت المصروف اليومي بمقدار ${Math.abs(remainingThatDay)} دينار
-            </div>
-          `;
-        } else if (remainingThatDay > 0) {
-          alert = `
-            <div class="alert alert-success">
-              ✅ وفّرت ${remainingThatDay} دينار في هذا اليوم
-            </div>
-          `;
-        }
-
-        grouped[date].forEach((amt, i) => {
-          const item = document.createElement("div");
-          item.className = "expense-item";
-          item.innerHTML = `
-            <span>مصروف ${i + 1}: ${amt} دينار</span>
-            <div class="expense-actions">
-              <button onclick="editExpense('${date}', ${i})">📝</button>
-              <button onclick="deleteExpense('${date}', ${i})">🗑️</button>
-            </div>
-          `;
-          card.appendChild(item);
-        });
-
-        const summary = document.createElement("div");
-        summary.className = "day-summary";
-        
-        let extraInfo = "";
-        if (extraForDay > 0) {
-          extraInfo += `الدخل الإضافي: ${extraForDay} دينار<br>`;
-        }
-        if (date === today && carry > 0) {
-          extraInfo += `المبلغ المرحل: ${carry.toFixed(2)} دينار<br>`;
-        }
-
-        summary.innerHTML = `
-          <div class="result-item">
-            <span>المصروف المتاح:</span>
-            <span>${limitThatDay.toFixed(2)} دينار</span>
-          </div>
-          <div class="result-item">
-            <span>المجموع:</span>
-            <span><b>${total} دينار</b></span>
-          </div>
-          ${alert}
-          <div style="margin-top:8px; color:#666; font-size:13px;">
-            ${extraInfo}
-          </div>
-        `;
-
-        card.appendChild(summary);
-        expenseContainer.appendChild(card);
-      });
-
-      let allDates = new Set();
-      let totalSpent = 0;
-      let maxSpent = 0;
-      let maxSpentDate = "";
-      let daysWithExpenses = new Set();
-      let savingsMap = {};
-
-      for (let exp of expenses) {
-        allDates.add(exp.date);
-        totalSpent += exp.amount;
-        if (!savingsMap[exp.date]) savingsMap[exp.date] = 0;
-        savingsMap[exp.date] += exp.amount;
-        if (savingsMap[exp.date] > maxSpent) {
-          maxSpent = savingsMap[exp.date];
-          maxSpentDate = exp.date;
-        }
-        daysWithExpenses.add(exp.date);
-      }
-
-      let numDays = allDates.size;
-      let avgSpent = numDays > 0 ? (totalSpent / numDays).toFixed(2) : 0;
-      let zeroSpendDays = [];
-      for (let date in extras) {
-        if (!daysWithExpenses.has(date)) zeroSpendDays.push(date);
-      }
-
-      document.getElementById("stats").innerHTML = `
-        <div class="stats-card">
-          <h3 class="section-title">
-            <i>📊</i>
-            <span>إحصائيات الإنفاق</span>
-          </h3>
-          <div class="stat-item">
-            <span>عدد الأيام المسجلة:</span>
-            <span><b>${numDays} يوم</b></span>
-          </div>
-          <div class="stat-item">
-            <span>إجمالي المصاريف:</span>
-            <span><b>${totalSpent.toFixed(2)} دينار</b></span>
-          </div>
-          <div class="stat-item">
-            <span>متوسط الإنفاق اليومي:</span>
-            <span><b>${avgSpent} دينار</b></span>
-          </div>
-          <div class="stat-item">
-            <span>أكثر يوم إنفاقًا:</span>
-            <span><b>${maxSpentDate} (${maxSpent.toFixed(2)} دينار)</b></span>
-          </div>
-          <div class="stat-item">
-            <span>أيام بدون مصروف:</span>
-            <span><b>${zeroSpendDays.length}</b></span>
-          </div>
-        </div>
-      `;
-
-      const salary = parseFloat(localStorage.getItem("saved_salary")) || 0;
-      const expensesBase = parseFloat(localStorage.getItem("saved_expenses")) || 0;
-
-      document.getElementById("settings-card").innerHTML = `
-        <div class="result-card">
-          <h3 class="section-title">
-            <i>⚙️</i>
-            <span>البيانات الأساسية</span>
-          </h3>
-          <div class="result-item">
-            <span>الراتب الشهري:</span>
-            <span><b>${salary} دينار</b></span>
-          </div>
-          <div class="result-item">
-            <span>الالتزامات الشهرية:</span>
-            <span><b>${expensesBase} دينار</b></span>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:15px;">
-            <button onclick="editSettings()" class="btn-info" style="flex:1;">
-              <i>✏️</i>
-              <span>تعديل</span>
-            </button>
-            <button onclick="deleteSettings()" class="btn-danger" style="flex:1;">
-              <i>🗑️</i>
-              <span>حذف</span>
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    function editSettings() {
-      document.getElementById("edit-salary").value = localStorage.getItem("saved_salary") || "";
-      document.getElementById("edit-expenses").value = localStorage.getItem("saved_expenses") || "";
-      document.getElementById("edit-modal").style.display = "flex";
-    }
-
-    function closeEditModal() {
-      document.getElementById("edit-modal").style.display = "none";
-    }
-
-  function saveEdits() {
-  const salary = parseFloat(document.getElementById("edit-salary").value);
-  const expenses = parseFloat(document.getElementById("edit-expenses").value);
-  if (!salary || salary <= 0 || isNaN(salary)) return alert("❌ أدخل راتب صالح");
-  if (expenses < 0 || isNaN(expenses)) return alert("❌ أدخل التزامات صالحة");
-
-  document.getElementById("salary").value = salary;
-  document.getElementById("expenses").value = expenses;
-  closeEditModal();
-  calculate(true); // ✅ نمرر true حتى لا يمسح المصاريف
+/* ---------- دخل إضافي ---------- */
+function addExtra(){
+  const a = num(document.getElementById('extra').value);
+  if(a<=0) return;
+  const extras = readJSON(K.extra, {});
+  extras[todayISO] = (extras[todayISO]||0) + a;
+  writeJSON(K.extra, extras);
+  document.getElementById('extra').value='';
+  updateUI();
 }
 
+/* ---------- إضافة مصروف ---------- */
+function addExpense(){
+  const amount = num(document.getElementById('amount').value);
+  if(amount<=0) return;
+  const cat = document.getElementById('category').value || 'عام';
+  const note = (document.getElementById('note').value||'').trim();
+  const list = readJSON(K.exps, []);
+  const item = { id: crypto.randomUUID ? crypto.randomUUID() : (Date.now()+''+Math.random()), amount, date: todayISO, category: cat, note };
+  list.push(item);
+  writeJSON(K.exps, list);
+  document.getElementById('amount').value='';
+  document.getElementById('note').value='';
+  updateUI();
+}
 
-    function deleteSettings() {
-      showConfirmModal("🗑️ هل تريد حذف الراتب والالتزامات؟ سيتم إعادة ضبط الحساب.", (confirmed) => {
-        if (confirmed) {
-          localStorage.removeItem("saved_salary");
-          localStorage.removeItem("saved_expenses");
-          location.reload();
-        }
-      });
-    }
+/* ---------- تعديل/حذف عنصر ---------- */
+function deleteExpense(id){
+  const list = readJSON(K.exps, []);
+  const idx = list.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  confirmBox('🗑️ هل تريد حذف هذا المصروف؟', (ok)=>{
+    if(!ok) return;
+    list.splice(idx,1);
+    writeJSON(K.exps, list);
+    updateUI();
+  });
+}
+function editExpense(id){
+  const list = readJSON(K.exps, []);
+  const it = list.find(x=>x.id===id);
+  if(!it) return;
+  const n = prompt('📝 قيمة جديدة:', it.amount);
+  const v = num(n);
+  if(v<=0) return;
+  it.amount = v;
+  writeJSON(K.exps, list);
+  updateUI();
+}
 
-    function deleteExpense(date, index) {
-      let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-      let filtered = [];
-      let count = 0;
-      for (let exp of expenses) {
-        if (exp.date === date) {
-          if (count === index) {
-            count++;
-            continue;
-          }
-          count++;
-        }
-        filtered.push(exp);
-      }
-      localStorage.setItem("expenses", JSON.stringify(filtered));
-      updateUI();
-    }
-
-function editExpense(date, index) {
-  showInputModal("📝 أدخل القيمة الجديدة للمصروف:", "", (newAmount) => {
-    if (!newAmount || isNaN(newAmount) || newAmount <= 0) return;
-
-    newAmount = parseFloat(newAmount);
-    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    let count = 0;
-    for (let i = 0; i < expenses.length; i++) {
-      if (expenses[i].date === date) {
-        if (count === index) {
-          expenses[i].amount = newAmount;
-          break;
-        }
-        count++;
-      }
-    }
-    localStorage.setItem("expenses", JSON.stringify(expenses));
+/* ---------- تنظيف مصاريف اليوم ---------- */
+function clearToday(){
+  const list = readJSON(K.exps, []);
+  const newList = list.filter(x=>x.date!==todayISO);
+  if(newList.length===list.length) return;
+  confirmBox('🧹 حذف كل مصاريف اليوم؟', (ok)=>{
+    if(!ok) return;
+    writeJSON(K.exps, newList);
     updateUI();
   });
 }
 
+/* ---------- حساب وترحيل يومي ---------- */
+function dailyRoll(){
+  const last = localStorage.getItem(K.last);
+  if(!last){ localStorage.setItem(K.last, todayISO); return; }
+  if(last===todayISO) return;
 
-function showInputModal(message, defaultValue, onConfirm) {
-  const modal = document.getElementById("custom-modal");
-  const messageBox = document.getElementById("custom-modal-message");
-  const okBtn = document.getElementById("custom-modal-ok");
-  const cancelBtn = document.getElementById("custom-modal-cancel");
+  const list = readJSON(K.exps, []);
+  const spentYesterday = list.filter(x=>x.date===last).reduce((s,x)=>s+x.amount,0);
+  const daily = num(localStorage.getItem(K.daily));
+  let carry = num(localStorage.getItem(K.carry));
+  const saved = Math.max(daily - spentYesterday, 0);
+  carry += saved;
+  localStorage.setItem(K.carry, carry.toFixed(2));
+  localStorage.setItem(K.last, todayISO);
+}
 
-  // أنشئ input داخل نافذة البوب
-  const inputField = document.createElement("input");
-  inputField.type = "number";
-  inputField.placeholder = "مثال: 12";
-  inputField.value = defaultValue || "";
-  inputField.style.width = "100%";
-  inputField.style.padding = "8px";
-  inputField.style.marginTop = "10px";
-  inputField.style.border = "1px solid #ccc";
-  inputField.style.borderRadius = "6px";
+/* ---------- فلترة ---------- */
+let filterFrom = null, filterTo = null;
+function applyFilter(){
+  const f = document.getElementById('fromDate').value || null;
+  const t = document.getElementById('toDate').value || null;
+  filterFrom = f; filterTo = t;
+  updateUI();
+}
+function resetFilter(){ filterFrom=null; filterTo=null; document.getElementById('fromDate').value=''; document.getElementById('toDate').value=''; updateUI(); }
 
-  messageBox.innerHTML = message;
-  messageBox.appendChild(inputField);
+/* ---------- ميزانيات ---------- */
+function saveBudget(){
+  const cat = document.getElementById('budgetCat').value || 'عام';
+  const val = num(document.getElementById('budgetVal').value);
+  if(val<=0) return;
+  const map = readJSON(K.budgets, {});
+  map[cat] = val;
+  writeJSON(K.budgets, map);
+  document.getElementById('budgetVal').value='';
+  renderBudgets();
+}
+function clearBudgets(){
+  confirmBox('🗑️ حذف كل ميزانيات التصنيفات؟', (ok)=>{
+    if(!ok) return;
+    writeJSON(K.budgets, {});
+    renderBudgets();
+    updateUI();
+  });
+}
 
-  modal.style.display = "flex";
-  inputField.focus();
-
-  const cleanup = () => {
-    modal.style.display = "none";
-    messageBox.innerHTML = "";
-    okBtn.onclick = null;
-    cancelBtn.onclick = null;
+/* ---------- تصدير/استيراد ---------- */
+function exportCSV(){
+  const list = readJSON(K.exps, []);
+  const rows = [['date','amount','category','note']].concat(
+    list.map(x=>[x.date, x.amount, x.category||'', (x.note||'').replace(/"/g,'""')])
+  );
+  const csv = rows.map(r=>r.map(c=>/[,"]/.test(String(c))?`"${String(c)}"`:String(c)).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `expenses_${todayISO}.csv`;
+  a.click();
+}
+function exportJSON(){
+  const data = {};
+  [K.salary,K.fixed,K.daily,K.plan,K.percent,K.last,K.carry,K.exps,K.extra,K.budgets,K.monthKey].forEach(k=>{
+    data[k]=localStorage.getItem(k);
+  });
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `expenses_backup_${todayISO}.json`;
+  a.click();
+}
+function importJSON(file){
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const data = JSON.parse(r.result);
+      // نسخة احتياطية قبل الاستيراد
+      const backup={}; Object.keys(localStorage).forEach(k=>backup[k]=localStorage.getItem(k));
+      localStorage.setItem(K.backup, JSON.stringify(backup));
+      for(const [k,v] of Object.entries(data)){ if(v!==undefined && v!==null) localStorage.setItem(k, v); }
+      updateUI();
+      document.getElementById('restoreBtn').style.display='inline-flex';
+      alert('✅ تم الاستيراد بنجاح');
+    }catch{ alert('❌ ملف غير صالح'); }
   };
+  r.readAsText(file);
+}
 
-  okBtn.onclick = () => {
-    const val = inputField.value;
-    cleanup();
-    onConfirm(val);
+/* ---------- طباعة ---------- */
+function printReport(){ window.print(); }
+
+/* ---------- ملخص أسبوعي ---------- */
+function generateWeeklySummary(){
+  const list = readJSON(K.exps, []);
+  const extras = readJSON(K.extra, {});
+  const p = num(localStorage.getItem(K.percent));
+  if(!list.length && !Object.keys(extras).length){ document.getElementById('weeklySummary').style.display='none'; return; }
+
+  const now = parseISO(todayISO);
+  const day = now.getDay(); // 0=Sunday (الأحد)
+  if(!(day===0 || day===6)) { document.getElementById('weeklySummary').style.display='none'; return; }
+
+  const lastKey = 'last_weekly_summary';
+  const last = localStorage.getItem(lastKey);
+  if(last===todayISO){ document.getElementById('weeklySummary').style.display='block'; return; }
+
+  const start = new Date(now); start.setDate(now.getDate()-6);
+  let total=0; const dayTotals={}; let maxSpent=0, maxDate='';
+  list.forEach(e=>{
+    const d=parseISO(e.date);
+    if(d>=start && d<=now){
+      total+=e.amount;
+      dayTotals[e.date]=(dayTotals[e.date]||0)+e.amount;
+    }
+  });
+  for(const [d,v] of Object.entries(dayTotals)){ if(v>maxSpent){ maxSpent=v; maxDate=d; } }
+
+  let saving=0;
+  for(const [d,val] of Object.entries(extras)){
+    const dd=parseISO(d);
+    if(dd>=start && dd<=now) saving += (num(val)*p/100);
+  }
+
+  const box = document.getElementById('weeklySummary');
+  box.innerHTML = `
+    <div class="section-title">📈 ملخص الأسبوع</div>
+    <div class="kv"><span>🧾 مجموع المصاريف</span><b>${total.toFixed(2)} د</b></div>
+    <div class="kv"><span>💰 المبلغ الموفّر من الدخل الإضافي</span><b>${saving.toFixed(2)} د</b></div>
+    <div class="kv"><span>🔥 اليوم الأعلى صرفًا</span><b>${maxDate?`${dayName(maxDate)} (${maxSpent.toFixed(2)} د)`:'—'}</b></div>
+    <div class="alert alert-success">👏 شُغل مرتب! كمل على هذا التنظيم.</div>
+  `;
+  box.style.display='block';
+  localStorage.setItem(lastKey, todayISO);
+}
+
+/* ---------- رسم بياني لآخر 7 أيام ---------- */
+function drawChart(){
+  const canvas = document.getElementById('chart');
+  const ctx = canvas.getContext('2d');
+  const DPR = window.devicePixelRatio||1;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  canvas.width = w*DPR; canvas.height = h*DPR; ctx.scale(DPR,DPR);
+  ctx.clearRect(0,0,w,h);
+
+  const list = readJSON(K.exps, []);
+  const map = {};
+  for(let i=6;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const iso = fmtDate(d); map[iso]=0;
+  }
+  list.forEach(e=>{ if(e.date in map) map[e.date]+=e.amount; });
+  const labels = Object.keys(map);
+  const vals = labels.map(d=>map[d]);
+  const max = Math.max(...vals, 10);
+  const pad=24, barW = (w - pad*2) / labels.length * .7;
+  labels.forEach((lb, i)=>{
+    const x = pad + i*((w - pad*2)/labels.length) + (((w - pad*2)/labels.length)-barW)/2;
+    const hBar = (vals[i]/max)*(h - pad*2);
+    ctx.fillStyle = '#4a6fa5';
+    const y = h - pad - hBar;
+    ctx.fillRect(x, y, barW, hBar);
+    ctx.fillStyle='#607d8b'; ctx.font='12px Tajawal';
+    ctx.fillText(lb.slice(5), x, h-6);
+  });
+}
+
+/* ---------- إحصائيات عامة + بطاقة اليوم ---------- */
+function renderStatsAndToday(){
+  const daily = num(localStorage.getItem(K.daily));
+  const carry = num(localStorage.getItem(K.carry));
+  const extras = readJSON(K.extra, {});
+  const extraToday = num(extras[todayISO]||0);
+  const p = num(localStorage.getItem(K.percent));
+  const baseSaving = num(localStorage.getItem(K.plan));
+  const totalSavingToday = (baseSaving/(daysInMonth(new Date().getFullYear(), new Date().getMonth()+1)) + (extraToday*p/100));
+
+  const list = readJSON(K.exps, []);
+  const todayItems = list.filter(x=>x.date===todayISO);
+  const spentToday = todayItems.reduce((s,x)=>s+x.amount,0);
+  const effectiveLimit = (daily + carry + extraToday);
+  const remaining = (effectiveLimit - spentToday);
+
+  // today panel
+  const todayPanel = document.getElementById('todayPanel');
+  const alert = remaining<0 ? `<div class="alert alert-danger">⚠️ تجاوزت المصروف اليومي بـ ${Math.abs(remaining).toFixed(2)} د</div>`
+    : `<div class="alert alert-success">✅ ممتاز! وفّرت ${remaining.toFixed(2)} د اليوم</div>`;
+  todayPanel.innerHTML = `
+    <div class="kv"><span>المصروف المتاح اليوم</span><b>${effectiveLimit.toFixed(2)} د</b></div>
+    <div class="kv"><span>الدخل الإضافي اليوم</span><b>${extraToday.toFixed(2)} د</b></div>
+    <div class="kv"><span>خطة التوفير (${p}%)</span><b>${totalSavingToday.toFixed(2)} د</b></div>
+    ${alert}
+  `;
+
+  // إشعار (اختياري)
+  if(remaining<0 && window.Notification && Notification.permission==='granted'){
+    try{ new Notification(`⚠️ تجاوزت المصروف بـ ${Math.abs(remaining).toFixed(2)} د`) }catch{}
+  }
+
+  // stats
+  const allDates = [...new Set(list.map(x=>x.date))];
+  const totalSpent = list.reduce((s,x)=>s+x.amount,0);
+  let maxSpent=0, maxSpentDate='—';
+  const dayTotals={};
+  list.forEach(x=>{ dayTotals[x.date]=(dayTotals[x.date]||0)+x.amount; if(dayTotals[x.date]>maxSpent){maxSpent=dayTotals[x.date]; maxSpentDate=x.date;} });
+  const avg = allDates.length ? (totalSpent/allDates.length) : 0;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="kv"><span>عدد الأيام المسجلة</span><b>${allDates.length} يوم</b></div>
+    <div class="kv"><span>إجمالي المصاريف</span><b>${totalSpent.toFixed(2)} د</b></div>
+    <div class="kv"><span>متوسط الإنفاق اليومي</span><b>${avg.toFixed(2)} د</b></div>
+    <div class="kv"><span>أكثر يوم إنفاقًا</span><b>${maxSpentDate==='—'?'—':`${maxSpentDate} (${maxSpent.toFixed(2)} د)`}</b></div>
+  `;
+}
+
+/* ---------- عرض السجل اليومي مع فلترة ---------- */
+function renderExpenseList(){
+  const wrap = document.getElementById('expenseList');
+  wrap.innerHTML='';
+  const extras = readJSON(K.extra, {});
+  const daily = num(localStorage.getItem(K.daily));
+  let carry = num(localStorage.getItem(K.carry));
+
+  // تطبيق الفلترة
+  const list = readJSON(K.exps, []);
+  let filtered = list;
+  if(filterFrom) filtered = filtered.filter(x=>x.date>=filterFrom);
+  if(filterTo) filtered = filtered.filter(x=>x.date<=filterTo);
+
+  // تجميع حسب التاريخ
+  const grouped = {};
+  filtered.forEach(e=>{ (grouped[e.date] ||= []).push(e); });
+  const dates = Object.keys(grouped).sort((a,b)=>parseISO(b)-parseISO(a));
+
+  dates.forEach(date=>{
+    const card = document.createElement('div');
+    card.className='day-card';
+
+    const header = document.createElement('div');
+    header.className='day-header';
+    header.innerHTML = `<div style="font-weight:700;color:var(--primary)">${dayName(date)} - ${date}</div>`;
+
+    const items = grouped[date];
+    const total = items.reduce((s,x)=>s+x.amount,0);
+    const extra = num(extras[date]||0);
+    const isToday = (date===todayISO);
+    const limitThatDay = (daily + extra + (isToday?carry:0));
+    const remaining = (limitThatDay - total);
+
+    const info = document.createElement('div');
+    info.innerHTML = `
+      <span class="badge">المتاح: ${limitThatDay.toFixed(2)} د</span>
+      <span class="badge">المجموع: ${total.toFixed(2)} د</span>
+      ${extra>0?`<span class="badge">دخل إضافي: ${extra.toFixed(2)} د</span>`:''}
+      ${isToday && carry>0?`<span class="badge">مرحل: ${carry.toFixed(2)} د</span>`:''}
+    `;
+    header.appendChild(info);
+    card.appendChild(header);
+
+    items.forEach(it=>{
+      const div = document.createElement('div');
+      div.className='expense-item';
+      div.innerHTML = `
+        <div>
+          <div>مصروف: <b>${it.amount.toFixed(2)} د</b> — <span class="expense-meta">[${it.category||'عام'}]</span></div>
+          ${it.note?`<div class="expense-meta">📝 ${it.note}</div>`:''}
+        </div>
+        <div class="actions">
+          <button onclick="editExpense('${it.id}')">✏️</button>
+          <button onclick="deleteExpense('${it.id}')">🗑️</button>
+        </div>
+      `;
+      card.appendChild(div);
+    });
+
+    const summary = document.createElement('div');
+    summary.className='hr';
+    card.appendChild(summary);
+
+    const alert = document.createElement('div');
+    alert.className = remaining<0 ? 'alert alert-warning':'alert alert-success';
+    alert.textContent = remaining<0 ? `⚠️ تجاوز بـ ${Math.abs(remaining).toFixed(2)} د`
+                                    : `✅ وفّر ${remaining.toFixed(2)} د`;
+    card.appendChild(alert);
+
+    wrap.appendChild(card);
+  });
+}
+
+/* ---------- عرض الميزانيات ---------- */
+function renderBudgets(){
+  const map = readJSON(K.budgets, {});
+  const list = readJSON(K.exps, []);
+  const month = todayISO.slice(0,7);
+  const start = `${month}-01`; const end = `${month}-31`;
+  const byCat = {};
+  list.forEach(x=>{
+    if(x.date>=start && x.date<=end){
+      const c = x.category||'عام';
+      byCat[c]=(byCat[c]||0)+x.amount;
+    }
+  });
+
+  const box = document.getElementById('budgetsView');
+  if(!Object.keys(map).length){ box.innerHTML='<div class="muted">لا توجد ميزانيات محددة.</div>'; return; }
+  box.innerHTML = '';
+  Object.entries(map).forEach(([cat,limit])=>{
+    const spent = byCat[cat]||0;
+    const ratio = Math.min(spent/limit, 1);
+    const row = document.createElement('div');
+    row.style.marginBottom='10px';
+    row.innerHTML = `
+      <div class="kv"><span>${cat}</span><b>${spent.toFixed(2)} / ${num(limit).toFixed(2)} د</b></div>
+      <div class="progress"><span style="width:${(ratio*100).toFixed(0)}%"></span></div>
+      ${spent>limit?'<div class="alert alert-danger">🚨 تم تجاوز ميزانية هذا التصنيف</div>':''}
+    `;
+    box.appendChild(row);
+  });
+}
+
+/* ---------- بطاقة الإعدادات ---------- */
+function renderSettings(){
+  const salary = num(localStorage.getItem(K.salary));
+  const fixed = num(localStorage.getItem(K.fixed));
+  const daily = num(localStorage.getItem(K.daily));
+  const save = num(localStorage.getItem(K.plan));
+  const p = num(localStorage.getItem(K.percent));
+  document.getElementById('settingsCard').innerHTML = `
+    <div class="kv"><span>الراتب الشهري</span><b>${salary.toFixed(2)} د</b></div>
+    <div class="kv"><span>الالتزامات الشهرية</span><b>${fixed.toFixed(2)} د</b></div>
+    <div class="kv"><span>التوفير الشهري (${p}%)</span><b>${save.toFixed(2)} د</b></div>
+    <div class="kv"><span>المصروف اليومي</span><b>${daily.toFixed(2)} د</b></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn-ghost" id="editSettingsBtn">✏️ تعديل</button>
+      <button class="btn-danger" id="deleteSettingsBtn">🗑️ حذف</button>
+    </div>
+    <div class="small" style="margin-top:6px">يتم توزيع التوفير يوميًا تلقائيًا في الملخص.</div>
+  `;
+  document.getElementById('editSettingsBtn').onclick = ()=>{
+    document.getElementById('salary').value = localStorage.getItem(K.salary)||'';
+    document.getElementById('fixed').value = localStorage.getItem(K.fixed)||'';
+    calculate(true); // إعادة حساب بدون مسح السجلات
   };
-
-  cancelBtn.onclick = () => {
-    cleanup();
+  document.getElementById('deleteSettingsBtn').onclick = ()=>{
+    confirmBox('🗑️ حذف الراتب والالتزامات؟ سيتم إعادة الضبط.', (ok)=>{
+      if(!ok) return;
+      localStorage.removeItem(K.salary);
+      localStorage.removeItem(K.fixed);
+      localStorage.removeItem(K.daily);
+      localStorage.removeItem(K.plan);
+      localStorage.removeItem(K.percent);
+      updateUI();
+    });
   };
 }
 
+/* ---------- تحديث كامل للواجهة ---------- */
+function updateUI(){
+  dailyRoll();
+  renderSettings();
+  renderStatsAndToday();
+  renderExpenseList();
+  renderBudgets();
+  drawChart();
+  generateWeeklySummary();
 
-    function showConfirmModal(message, onConfirm) {
-      const modal = document.getElementById("custom-modal");
-      const messageBox = document.getElementById("custom-modal-message");
-      const okBtn = document.getElementById("custom-modal-ok");
-      const cancelBtn = document.getElementById("custom-modal-cancel");
+  // أزرار النسخ الاحتياطية
+  document.getElementById('restoreBtn').style.display = localStorage.getItem(K.backup)?'inline-flex':'none';
+}
 
-      messageBox.textContent = message;
-      modal.style.display = "flex";
+/* ---------- أزرار عامة ---------- */
+document.getElementById('calcBtn').onclick = ()=>calculate(false);
+document.getElementById('addExtraBtn').onclick = addExtra;
+document.getElementById('addExpenseBtn').onclick = addExpense;
+document.getElementById('clearTodayBtn').onclick = clearToday;
+document.getElementById('applyFilterBtn').onclick = applyFilter;
+document.getElementById('resetFilterBtn').onclick = resetFilter;
+document.getElementById('saveBudgetBtn').onclick = saveBudget;
+document.getElementById('clearBudgetsBtn').onclick = clearBudgets;
+document.getElementById('exportCsvBtn').onclick = exportCSV;
+document.getElementById('exportJsonBtn').onclick = exportJSON;
+document.getElementById('importJsonInput').addEventListener('change',e=>{ if(e.target.files?.[0]) importJSON(e.target.files[0]) });
+document.getElementById('printBtn').onclick = printReport;
 
-      const cleanup = () => {
-        modal.style.display = "none";
-        okBtn.onclick = null;
-        cancelBtn.onclick = null;
-      };
+document.getElementById('resetBtn').onclick = ()=>{
+  confirmBox('هل أنت متأكد من حذف جميع البيانات؟', (ok)=>{
+    if(!ok) return;
+    const backup={}; Object.keys(localStorage).forEach(k=>backup[k]=localStorage.getItem(k));
+    localStorage.setItem(K.backup, JSON.stringify(backup));
+    localStorage.clear();
+    localStorage.setItem(K.backup, JSON.stringify(backup));
+    location.reload();
+  });
+};
+document.getElementById('restoreBtn').onclick = ()=>{
+  confirmBox('📦 استرجاع آخر نسخة احتياطية؟', (ok)=>{
+    if(!ok) return;
+    const data = readJSON(K.backup, null);
+    if(!data){ alert('لا توجد نسخة متاحة'); return; }
+    for(const [k,v] of Object.entries(data)){ if(v!==null) localStorage.setItem(k,v); }
+    updateUI();
+  });
+};
 
-      okBtn.onclick = () => {
-        cleanup();
-        onConfirm(true);
-      };
-
-      cancelBtn.onclick = () => {
-        cleanup();
-        onConfirm(false);
-      };
-    }
-
-    function restoreBackup() {
-      showConfirmModal("📦 هل تريد استرجاع البيانات المحذوفة؟", (confirmed) => {
-        if (!confirmed) return;
-
-        const data = JSON.parse(localStorage.getItem("backup_data"));
-        for (let key in data) {
-          if (data[key]) localStorage.setItem(key, data[key]);
-        }
-        localStorage.removeItem("backup_data");
-        location.reload();
-      });
-    }
-
-    function resetData() {
-      showConfirmModal("هل أنت متأكد أنك تريد حذف جميع البيانات؟", (confirmed) => {
-        if (confirmed) {
-          const backup = {
-            saved_salary: localStorage.getItem("saved_salary"),
-            saved_expenses: localStorage.getItem("saved_expenses"),
-            daily_limit: localStorage.getItem("daily_limit"),
-            carry: localStorage.getItem("carry"),
-            expenses: localStorage.getItem("expenses"),
-            extra_income: localStorage.getItem("extra_income"),
-            last_date: localStorage.getItem("last_date"),
-            saving_plan: localStorage.getItem("saving_plan"),
-            saving_percent: localStorage.getItem("saving_percent")
-          };
-
-          localStorage.clear();
-          localStorage.setItem("backup_data", JSON.stringify(backup));
-          location.reload();
-        }
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-      }
-
-      updateUI();
-      generateWeeklySummary();
-      document.getElementById("salary").value = localStorage.getItem("saved_salary") || "";
-      document.getElementById("expenses").value = localStorage.getItem("saved_expenses") || "";
-
-      if (localStorage.getItem("backup_data")) {
-        document.getElementById("restore-btn").style.display = "block";
-      }
-    });
-  </script>
+/* ---------- تحميل أولي ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // تعبئة الحقول بالقيم المخزنة
+  document.getElementById('salary').value = localStorage.getItem(K.salary)||'';
+  document.getElementById('fixed').value = localStorage.getItem(K.fixed)||'';
+  updateUI();
+});
+</script>
 </body>
 </html>
